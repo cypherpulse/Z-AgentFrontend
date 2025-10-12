@@ -1,0 +1,1536 @@
+
+
+Build a modern, production-ready web3 application for interacting with Zora Coins on Base blockchain. This is a comprehensive dashboard for discovering, creating, trading, and scheduling Zora coins.
+
+---
+
+## 🎯 Project Overview
+
+**Name**: Z-Agent Dashboard  
+**Purpose**: Full-featured UI for Zora Coins SDK via REST API  
+**API Base URL**: `https://z-agent.onrender.com`  
+**Blockchain**: Base (Chain ID: 8453)  
+**Total API Endpoints**: 37
+
+---
+
+## 🛠️ Tech Stack Requirements
+
+### Core Technologies
+- **React 18+** with TypeScript
+- **Tailwind CSS** for styling
+- **RainbowKit** for wallet connection (Ethereum wallets)
+- **wagmi** for blockchain interactions
+- **viem** for Ethereum utilities
+- **React Router v6** for navigation
+- **TanStack Query (React Query)** for data fetching & caching
+- **Axios** for API calls
+- **date-fns** for date formatting
+- **Lucide React** or **Heroicons** for icons
+- **React Hot Toast** for notifications
+
+### Optional but Recommended
+- **Zustand** for global state management
+- **React Hook Form** + **Zod** for form validation
+- **Framer Motion** for animations
+- **Recharts** for data visualization
+
+---
+
+## 🎨 Design System
+
+### Color Palette (Tailwind Config)
+
+```javascript
+colors: {
+  primary: {
+    50: '#f0fdf4',   // Very light green
+    100: '#dcfce7',  // Light green
+    200: '#bbf7d0',  // Soft green
+    300: '#86efac',  // Bright green
+    400: '#4ade80',  // Vibrant green
+    500: '#22c55e',  // Core green (main primary)
+    600: '#16a34a',  // Darker green
+    700: '#15803d',  // Deep green
+    800: '#166534',  // Dark green
+    900: '#14532d',  // Very dark green
+  },
+  accent: {
+    50: '#fff7ed',   // Very light orange
+    100: '#ffedd5',  // Light orange
+    200: '#fed7aa',  // Soft orange
+    300: '#fdba74',  // Warm orange
+    400: '#fb923c',  // Bright orange
+    500: '#f97316',  // Core orange (main accent)
+    600: '#ea580c',  // Darker orange
+    700: '#c2410c',  // Deep orange
+    800: '#9a3412',  // Dark orange
+    900: '#7c2d12',  // Very dark orange
+  },
+}
+```
+
+### Design Principles
+- **Modern & Clean**: Glassmorphism, subtle shadows, rounded corners
+- **Responsive**: Mobile-first approach, works on all screen sizes
+- **Accessible**: WCAG 2.1 AA compliant
+- **Smooth Animations**: Framer Motion for page transitions and interactions
+- **Dark Mode Support**: Toggle between light/dark themes
+
+---
+
+## 📋 Application Structure
+
+### Page/Route Structure
+
+```
+/                          → Home/Landing Page
+/explore                   → Discover Coins (8 explore endpoints)
+  /explore/top-gainers     → Top gaining coins
+  /explore/top-volume      → Highest volume coins
+  /explore/most-valuable   → Highest market cap
+  /explore/new             → Recently created
+  /explore/last-traded     → Recently traded
+  /explore/unique-traders  → Unique trader activity
+  /explore/new-creators    → New creator coins
+  /explore/valuable-creators → Top creator coins
+
+/coin/:address             → Single Coin Detail Page
+  - Coin info, chart, stats
+  - Holders list
+  - Swap history
+  - Comments section
+
+/profile/:identifier       → User Profile Page
+  - Profile info
+  - Created coins
+  - Token balances
+
+/trade                     → Trading Interface
+  - Swap ETH ↔ ERC20
+  - Trade quote calculator
+  - Transaction preparation
+
+/create                    → Create Coin Page
+  - Metadata upload form
+  - Coin creation wizard
+  - Preview & confirmation
+
+/schedule                  → Scheduler Dashboard
+  /schedule/new            → Schedule new coin
+  /schedule/list           → View scheduled coins
+  /schedule/:id            → Scheduled coin details
+
+/account                   → User Account/Settings
+  - Wallet connection status
+  - Transaction history
+  - Settings
+
+/docs                      → API Documentation viewer
+```
+
+---
+
+## 🔌 API Endpoints Reference
+
+### Base URL
+```
+API_BASE_URL = "http://localhost:3000"
+```
+
+---
+
+## 📡 Complete API Endpoints (37 Total)
+
+### 1️⃣ HEALTH CHECK (1 endpoint)
+
+#### GET /health
+**Purpose**: Check API server status  
+**Auth**: None  
+**Response**:
+```json
+{
+  "status": "ok",
+  "timestamp": "2025-10-11T10:00:00.000Z",
+  "uptime": 12345,
+  "database": "connected"
+}
+```
+
+**UI Usage**: Display in footer or admin panel
+
+---
+
+### 2️⃣ AUTHENTICATION (4 endpoints)
+
+#### POST /api/auth/get-nonce
+**Purpose**: Get nonce for SIWE authentication  
+**Auth**: None  
+**Body**:
+```json
+{
+  "walletAddress": "0x..."
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "nonce": "abc123...",
+    "expiresAt": "2025-10-11T10:05:00.000Z"
+  }
+}
+```
+
+#### POST /api/auth/verify-signature
+**Purpose**: Verify signature and get JWT token  
+**Auth**: None  
+**Body**:
+```json
+{
+  "walletAddress": "0x...",
+  "signature": "0x...",
+  "nonce": "abc123..."
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Authentication successful",
+  "data": {
+    "token": "eyJhbG...",
+    "user": {
+      "walletAddress": "0x...",
+      "zoraProfile": { ... }
+    }
+  }
+}
+```
+
+#### POST /api/auth/refresh
+**Purpose**: Refresh expired JWT token  
+**Auth**: JWT Required  
+**Response**: New JWT token
+
+#### POST /api/auth/logout
+**Purpose**: Invalidate current session  
+**Auth**: JWT Required
+
+**UI Flow**:
+1. Connect wallet via RainbowKit
+2. Get nonce for wallet address
+3. Sign message with wallet (SIWE standard)
+4. Verify signature to get JWT
+5. Store JWT in localStorage/sessionStorage
+6. Include JWT in Authorization header for protected routes
+
+---
+
+### 3️⃣ COIN QUERIES (4 endpoints)
+
+#### GET /api/coins/:address
+**Purpose**: Get detailed information about a specific coin  
+**Auth**: None  
+**Path Params**: `address` - Coin contract address  
+**Query Params**: `chain` (optional) - Chain ID (default: 8453)  
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "address": "0x...",
+    "name": "My Coin",
+    "symbol": "COIN",
+    "metadata": {
+      "name": "My Coin",
+      "description": "...",
+      "image": "ipfs://...",
+      "creator": "0x..."
+    },
+    "marketCap": "1000000000000000000",
+    "price": "1000000000000000",
+    "holders": 150,
+    "totalSupply": "1000000000000000000",
+    "creator": {
+      "address": "0x...",
+      "profile": { ... }
+    }
+  }
+}
+```
+
+**UI Components**: 
+- Coin detail page header
+- Price chart
+- Stats cards (market cap, holders, supply)
+
+#### GET /api/coins/:address/holders
+**Purpose**: Get list of coin holders with balances  
+**Auth**: None  
+**Query Params**:
+- `chainId` - Chain ID (required)
+- `after` - Cursor for pagination (optional)
+- `count` - Results per page (max 100, default 20)
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "holders": [
+      {
+        "address": "0x...",
+        "balance": "1000000000000000000",
+        "percentage": 10.5
+      }
+    ],
+    "pageInfo": {
+      "hasNextPage": true,
+      "endCursor": "abc123..."
+    }
+  }
+}
+```
+
+**UI Component**: Holders table with pagination
+
+#### GET /api/coins/:address/swaps
+**Purpose**: Get swap/trade history for a coin  
+**Auth**: None  
+**Query Params**:
+- `chain` - Chain ID (optional)
+- `after` - Cursor (optional)
+- `first` - Results per page (max 100, default 20)
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "swaps": [
+      {
+        "timestamp": "2025-10-11T10:00:00.000Z",
+        "type": "BUY" | "SELL",
+        "amountIn": "1000000000000000000",
+        "amountOut": "500000000000000000",
+        "trader": "0x...",
+        "transactionHash": "0x..."
+      }
+    ],
+    "pageInfo": { ... }
+  }
+}
+```
+
+**UI Component**: Transaction history table
+
+#### GET /api/coins/:address/comments
+**Purpose**: Get comments/discussion for a coin  
+**Auth**: None  
+**Query Params**: `chain`, `after`, `count`  
+**Response**: List of comments with pagination
+
+**UI Component**: Comments section like social media
+
+---
+
+### 4️⃣ EXPLORE ENDPOINTS (8 endpoints)
+
+All explore endpoints follow similar patterns:
+- **Auth**: None
+- **Query Params**: `after` (cursor), `count` (max 100)
+- **Returns**: List of coins with pagination
+
+#### GET /api/explore/top-gainers
+**Purpose**: Coins with highest price increase (24h)  
+**UI**: Trending section, "🔥 Hottest" badge
+
+#### GET /api/explore/top-volume
+**Purpose**: Coins with highest trading volume (24h)  
+**UI**: "Most Traded" section
+
+#### GET /api/explore/most-valuable
+**Purpose**: Coins with highest market capitalization  
+**UI**: "Top Coins" section, sorted by market cap
+
+#### GET /api/explore/new
+**Purpose**: Recently created coins  
+**UI**: "New Launches" section with "NEW" badge
+
+#### GET /api/explore/last-traded
+**Purpose**: Coins with most recent trading activity  
+**UI**: "Recently Traded" live feed
+
+#### GET /api/explore/last-traded-unique
+**Purpose**: Coins sorted by unique trader count  
+**UI**: "Community Favorites" based on trader diversity
+
+#### GET /api/explore/new-creators
+**Purpose**: New creator coins (profiles with coins)  
+**UI**: "New Creators" showcase
+
+#### GET /api/explore/most-valuable-creators
+**Purpose**: Creator coins with highest value  
+**UI**: "Top Creators" leaderboard
+
+**Common Response Format**:
+```json
+{
+  "success": true,
+  "data": {
+    "coins": [
+      {
+        "address": "0x...",
+        "name": "Coin Name",
+        "symbol": "SYM",
+        "marketCap": "...",
+        "priceChange24h": 15.5,
+        "volume24h": "...",
+        "metadata": { ... }
+      }
+    ],
+    "pageInfo": {
+      "hasNextPage": boolean,
+      "endCursor": "cursor..."
+    }
+  }
+}
+```
+
+**UI Page**: `/explore` with tabs or filter dropdown for each category
+
+---
+
+### 5️⃣ PROFILE ENDPOINTS (3 endpoints)
+
+#### GET /api/profile/:identifier
+**Purpose**: Get user profile information  
+**Auth**: None  
+**Path Params**: `identifier` - Wallet address or username  
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "address": "0x...",
+    "handle": "@username",
+    "displayName": "Display Name",
+    "bio": "Bio text...",
+    "avatar": {
+      "small": "url",
+      "medium": "url"
+    },
+    "socialAccounts": {
+      "twitter": { ... },
+      "farcaster": { ... }
+    },
+    "creatorCoin": {
+      "address": "0x...",
+      "marketCap": "..."
+    }
+  }
+}
+```
+
+**UI Component**: Profile header with avatar, bio, social links
+
+#### GET /api/profile/:identifier/coins
+**Purpose**: Get coins created by a user  
+**Auth**: None  
+**Query Params**: `after`, `count`, `chainIds`, `platformReferrerAddress`  
+**Response**: List of coins with pagination
+
+**UI Component**: "Created Coins" grid/list on profile page
+
+#### GET /api/profile/:identifier/balances
+**Purpose**: Get token balances for a user  
+**Auth**: None  
+**Query Params**: `after`, `count`  
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "balances": [
+      {
+        "coin": {
+          "address": "0x...",
+          "name": "Coin",
+          "symbol": "SYM"
+        },
+        "balance": "1000000000000000000",
+        "value": "500000000000000000"
+      }
+    ],
+    "pageInfo": { ... }
+  }
+}
+```
+
+**UI Component**: Portfolio section showing all holdings
+
+---
+
+### 6️⃣ WRITE OPERATIONS - COIN CREATION (4 endpoints)
+
+All write endpoints require JWT authentication!
+
+#### POST /api/write/upload-metadata
+**Purpose**: Upload coin metadata to IPFS  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "name": "My Coin",
+  "symbol": "COIN",
+  "description": "Coin description...",
+  "imageUri": "https://example.com/image.png"
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "uri": "ipfs://bafkreiabc123...",
+    "metadata": { ... }
+  }
+}
+```
+
+**UI**: Step 1 in coin creation wizard
+
+#### POST /api/write/create-coin/prepare
+**Purpose**: Create coin and upload metadata in one call  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "name": "My Coin",
+  "symbol": "COIN",
+  "description": "Description...",
+  "imageUri": "https://...",
+  "currency": "ZORA" | "ETH" | "CREATOR_COIN" | "CREATOR_COIN_OR_ZORA",
+  "startingMarketCap": "LOW" | "HIGH",
+  "chainId": 8453,
+  "platformReferrer": "0x..." (optional),
+  "additionalOwners": ["0x..."] (optional),
+  "payoutRecipientOverride": "0x..." (optional)
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "metadataUri": "ipfs://...",
+    "transaction": {
+      "to": "0x...",
+      "data": "0x...",
+      "value": "0"
+    }
+  }
+}
+```
+
+**UI Flow**:
+1. Show creation form
+2. Call API to get transaction data
+3. Use wagmi `sendTransaction` to execute
+4. Show transaction status and confirmation
+
+#### POST /api/write/create-coin/with-metadata-uri
+**Purpose**: Create coin with existing metadata URI  
+**Auth**: JWT Required  
+**Body**: Similar but uses `metadataUri` instead of metadata fields
+
+#### POST /api/write/validate-metadata
+**Purpose**: Validate metadata URI before creation  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "uri": "ipfs://..."
+}
+```
+
+**UI**: Validation step showing metadata preview
+
+---
+
+### 7️⃣ WRITE OPERATIONS - TRADING (4 endpoints)
+
+#### POST /api/trade/prepare
+**Purpose**: Prepare a trade/swap transaction  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "sell": {
+    "type": "eth" | "erc20",
+    "address": "0x..." (if erc20)
+  },
+  "buy": {
+    "type": "eth" | "erc20",
+    "address": "0x..."
+  },
+  "amountIn": "1000000000000000000",
+  "slippage": 0.01 (1%, optional),
+  "recipient": "0x..." (optional),
+  "permitActiveSeconds": 600 (optional)
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "transaction": {
+      "to": "0x...",
+      "data": "0x...",
+      "value": "0"
+    },
+    "expectedOutput": "950000000000000000",
+    "minimumOutput": "940500000000000000",
+    "priceImpact": 0.5
+  }
+}
+```
+
+**UI Component**: Trading interface with input/output fields, slippage settings
+
+#### POST /api/trade/quote
+**Purpose**: Get price quote without executing trade  
+**Auth**: JWT Required  
+**Body**: Same as `/prepare` but without execution  
+**Response**: Expected amounts and price impact
+
+**UI**: Real-time price updates as user types amounts
+
+#### POST /api/trade/validate
+**Purpose**: Validate trade parameters before execution  
+**Auth**: JWT Required  
+**Body**: Same as `/prepare`
+
+**UI**: Pre-flight check before transaction
+
+#### GET /api/trade/supported-tokens
+**Purpose**: Get list of tokens available for trading  
+**Auth**: JWT Required  
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "tokens": [
+      {
+        "address": "0x...",
+        "symbol": "TOKEN",
+        "name": "Token Name",
+        "decimals": 18
+      }
+    ]
+  }
+}
+```
+
+**UI**: Token selector dropdown in trade interface
+
+---
+
+### 8️⃣ WRITE OPERATIONS - UPDATE COINS (2 endpoints)
+
+#### PUT /api/write/update-coin-uri
+**Purpose**: Update coin metadata URI (owners only)  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "coin": "0x...",
+  "newURI": "ipfs://..." or "https://..."
+}
+```
+**Response**: Transaction data
+
+**UI**: Settings page for coin owners
+
+#### PUT /api/write/update-payout-recipient
+**Purpose**: Update payout recipient address (owners only)  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "coin": "0x...",
+  "newPayoutRecipient": "0x..."
+}
+```
+
+**UI**: Treasury settings in coin management
+
+---
+
+### 9️⃣ SCHEDULER ENDPOINTS (7 endpoints)
+
+#### POST /api/scheduler/schedule
+**Purpose**: Schedule a coin creation for future date/time  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "scheduledFor": "2025-10-15T14:30:00.000Z",
+  "name": "Future Coin",
+  "symbol": "FUT",
+  "metadataUri": "ipfs://...",
+  "currency": "ZORA",
+  "startingMarketCap": "LOW",
+  "chainId": 8453,
+  "maxRetries": 3 (optional)
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "scheduledCoinId123",
+    "scheduledFor": "2025-10-15T14:30:00.000Z",
+    "status": "pending",
+    "coinParams": { ... }
+  }
+}
+```
+
+**UI**: Scheduler form with date/time picker (min: 5 min, max: 30 days)
+
+#### GET /api/scheduler/scheduled-coins
+**Purpose**: Get all scheduled coins for authenticated user  
+**Auth**: JWT Required  
+**Query Params**:
+- `status` - Filter: `pending` | `processing` | `completed` | `failed` | `cancelled`
+- `limit` - Results per page (max 100)
+- `skip` - Pagination offset
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "scheduledCoins": [ ... ],
+    "total": 50,
+    "hasMore": true
+  }
+}
+```
+
+**UI**: Dashboard table with status badges, filters
+
+#### GET /api/scheduler/scheduled-coins/:id
+**Purpose**: Get specific scheduled coin details  
+**Auth**: JWT Required  
+**Response**: Single scheduled coin with full details
+
+**UI**: Detail modal or page
+
+#### GET /api/scheduler/scheduled-coins/:id/calldata
+**Purpose**: Get transaction calldata for manual execution  
+**Auth**: JWT Required  
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "to": "0x...",
+    "data": "0x...",
+    "value": "0",
+    "chainId": 8453
+  }
+}
+```
+
+**UI**: "Execute Now" button that uses wagmi to send transaction
+
+#### PUT /api/scheduler/scheduled-coins/:id
+**Purpose**: Update scheduled time (pending coins only)  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "scheduledFor": "2025-10-16T10:00:00.000Z"
+}
+```
+
+**UI**: Reschedule button/modal
+
+#### DELETE /api/scheduler/scheduled-coins/:id
+**Purpose**: Cancel scheduled coin (pending coins only)  
+**Auth**: JWT Required
+
+**UI**: Cancel button with confirmation dialog
+
+#### POST /api/scheduler/scheduled-coins/:id/execute
+**Purpose**: Manually confirm execution after transaction  
+**Auth**: JWT Required  
+**Body**:
+```json
+{
+  "transactionHash": "0x...",
+  "coinAddress": "0x..."
+}
+```
+
+**UI**: Auto-called after successful transaction execution
+
+---
+
+## 🎨 UI/UX Requirements
+
+### Navigation
+- **Top Navigation Bar**:
+  - Logo (left)
+  - Links: Explore, Trade, Create, Schedule (center)
+  - Wallet connect button (right) - RainbowKit
+  - User menu when connected (profile, settings, logout)
+
+- **Mobile**: Hamburger menu with slide-out drawer
+
+### Key Pages Design
+
+#### 1. Home/Landing Page (`/`)
+**Sections**:
+- Hero section with headline and CTA buttons
+- Featured/trending coins carousel
+- Quick stats (total coins, 24h volume, users)
+- "How it works" steps
+- Recent activity feed
+
+#### 2. Explore Page (`/explore`)
+**Layout**:
+- Tab navigation or filter dropdown for 8 explore types
+- Coin grid (cards) or table view toggle
+- Infinite scroll or pagination
+- Search bar
+- Sort options (market cap, volume, price change)
+
+**Coin Card**:
+- Coin image/logo
+- Name and symbol
+- Market cap
+- 24h price change (green/red)
+- Quick view button → modal with details
+- Navigate to coin page on click
+
+#### 3. Coin Detail Page (`/coin/:address`)
+**Sections**:
+- **Header**: Image, name, symbol, contract address (copy)
+- **Stats Row**: Market cap, price, holders, volume
+- **Chart**: Price chart (7d, 30d, all time)
+- **Tabs**:
+  - Overview (description, creator info)
+  - Holders (table with pagination)
+  - Swaps (transaction history)
+  - Comments (discussion)
+- **Action Buttons**: Trade, Add to watchlist, Share
+
+#### 4. Profile Page (`/profile/:identifier`)
+**Layout**:
+- Profile header (avatar, name, bio, social links)
+- Stats cards (coins created, total market cap)
+- Tabs:
+  - Created Coins (grid)
+  - Portfolio/Balances (table)
+  - Activity (transaction history)
+
+#### 5. Trading Page (`/trade`)
+**Layout**:
+- Two-column layout:
+  - Left: Trade form
+    - "You Pay" input (token selector + amount)
+    - Swap arrow (reverse button)
+    - "You Receive" output (auto-calculated)
+    - Slippage settings (gear icon)
+    - Price impact warning if > 5%
+    - "Connect Wallet" or "Swap" button
+  - Right: Trade summary
+    - Expected output
+    - Minimum received
+    - Price impact
+    - Fee breakdown
+    - Route visualization (if multi-hop)
+
+- Recent trades table below
+
+#### 6. Create Coin Page (`/create`)
+**Wizard Steps**:
+1. **Metadata**:
+   - Name input
+   - Symbol input
+   - Description textarea
+   - Image upload (IPFS)
+   - Preview card
+
+2. **Configuration**:
+   - Currency dropdown (ZORA, ETH, CREATOR_COIN)
+   - Starting market cap (LOW/HIGH)
+   - Platform referrer (optional)
+   - Additional owners (optional)
+   - Payout recipient (optional)
+
+3. **Review**:
+   - Summary of all inputs
+   - Estimated cost
+   - Terms acceptance
+
+4. **Create**:
+   - Upload metadata to IPFS
+   - Prepare transaction
+   - Execute with wallet
+   - Success screen with coin link
+
+#### 7. Scheduler Dashboard (`/schedule`)
+**Tabs**:
+- **Schedule New** (`/schedule/new`):
+  - Form similar to create coin
+  - Date/time picker (min: now + 5 min, max: now + 30 days)
+  - Timezone selector
+  - Confirmation
+
+- **Scheduled Coins** (`/schedule/list`):
+  - Table with columns:
+    - Coin Name
+    - Symbol
+    - Scheduled Time (countdown)
+    - Status (badge)
+    - Actions (View, Execute, Reschedule, Cancel)
+  - Filter by status
+  - Pagination
+
+- **Detail View** (`/schedule/:id`):
+  - Coin parameters
+  - Schedule info
+  - Status timeline
+  - Action buttons based on status
+  - Execute button (when time arrives)
+
+#### 8. Account/Settings (`/account`)
+**Sections**:
+- Wallet info (address, balance)
+- Transaction history
+- Notifications settings
+- Theme toggle (light/dark)
+- Language selector
+
+---
+
+## 🔐 Authentication Flow
+
+### Implementation Steps
+
+1. **Wallet Connection** (RainbowKit):
+```typescript
+// User clicks "Connect Wallet"
+// RainbowKit modal opens
+// User selects wallet (MetaMask, Coinbase, etc.)
+// Wallet connected → get address from wagmi
+```
+
+2. **Get Nonce**:
+```typescript
+// Call: POST /api/auth/get-nonce
+// Body: { walletAddress: address }
+// Response: { nonce, expiresAt }
+```
+
+3. **Sign Message** (SIWE):
+```typescript
+// Use wagmi signMessage
+// Message format:
+"Sign in to Z-Agent
+
+Nonce: {nonce}
+Issued At: {timestamp}"
+
+// User signs in wallet
+// Get signature
+```
+
+4. **Verify Signature**:
+```typescript
+// Call: POST /api/auth/verify-signature
+// Body: { walletAddress, signature, nonce }
+// Response: { token, user }
+// Store token in localStorage
+```
+
+5. **Authenticated Requests**:
+```typescript
+// Include in all protected route requests:
+headers: {
+  'Authorization': `Bearer ${token}`
+}
+```
+
+6. **Token Refresh**:
+```typescript
+// When token expires (7 days):
+// Call: POST /api/auth/refresh
+// Get new token
+```
+
+### UI States
+- **Not Connected**: Show "Connect Wallet" button
+- **Connected, Not Authenticated**: Auto-trigger auth flow
+- **Authenticated**: Show user menu with address (truncated)
+- **Auth Error**: Show error toast, retry button
+
+---
+
+## 📊 Data Fetching Strategy
+
+### React Query Setup
+
+```typescript
+// Use TanStack Query for all API calls
+// Benefits: Caching, auto-refetch, loading states, error handling
+
+// Example query keys:
+['coin', address]
+['coins', 'explore', 'top-gainers', { after, count }]
+['profile', identifier]
+['scheduled-coins', { status, limit, skip }]
+['trade-quote', { sell, buy, amountIn }]
+```
+
+### Fetching Patterns
+
+**Queries** (GET requests):
+- Auto-fetch on component mount
+- Cache for 5 minutes
+- Refetch on window focus
+- Stale time: 1 minute
+
+**Mutations** (POST/PUT/DELETE):
+- Invalidate related queries on success
+- Show loading state
+- Success/error toasts
+- Optimistic updates where applicable
+
+**Polling** (Real-time data):
+- Trade quotes: Refetch every 10 seconds
+- Scheduled coins: Refetch every 30 seconds
+- Price charts: Refetch every 60 seconds
+
+---
+
+## 🎭 Component Architecture
+
+### Atomic Design Structure
+
+```
+components/
+├── ui/              # Base components (buttons, inputs, cards)
+│   ├── Button.tsx
+│   ├── Input.tsx
+│   ├── Card.tsx
+│   ├── Badge.tsx
+│   ├── Modal.tsx
+│   └── ...
+├── features/        # Feature-specific components
+│   ├── auth/
+│   │   ├── ConnectButton.tsx
+│   │   ├── UserMenu.tsx
+│   │   └── AuthGuard.tsx
+│   ├── coins/
+│   │   ├── CoinCard.tsx
+│   │   ├── CoinTable.tsx
+│   │   ├── CoinChart.tsx
+│   │   └── CoinDetail.tsx
+│   ├── trade/
+│   │   ├── TradeForm.tsx
+│   │   ├── TokenSelector.tsx
+│   │   ├── SlippageSettings.tsx
+│   │   └── TradeHistory.tsx
+│   ├── scheduler/
+│   │   ├── ScheduleForm.tsx
+│   │   ├── ScheduledCoinCard.tsx
+│   │   ├── ScheduledCoinTable.tsx
+│   │   └── ExecuteButton.tsx
+│   └── profile/
+│       ├── ProfileHeader.tsx
+│       ├── CreatedCoins.tsx
+│       └── Portfolio.tsx
+├── layouts/         # Page layouts
+│   ├── MainLayout.tsx
+│   ├── DashboardLayout.tsx
+│   └── AuthLayout.tsx
+└── shared/          # Shared across features
+    ├── Navbar.tsx
+    ├── Footer.tsx
+    ├── Pagination.tsx
+    └── LoadingSpinner.tsx
+```
+
+### Key Component Features
+
+**CoinCard**:
+- Image with fallback
+- Price change badge (green/red with arrow)
+- Hover effects
+- Quick actions (trade, view, favorite)
+
+**TradeForm**:
+- Token input with balance display
+- Auto-calculated output
+- Slippage tolerance slider
+- Gas estimation
+- Transaction state management
+
+**ScheduleForm**:
+- Date/time picker with validation
+- Timezone awareness
+- Preview of scheduled coin
+- Error messages for validation
+
+**ConnectButton** (RainbowKit):
+- Shows "Connect Wallet" when disconnected
+- Shows truncated address when connected
+- Dropdown menu: Profile, Settings, Disconnect
+
+---
+
+## 🎨 Styling Guidelines
+
+### Tailwind Classes
+
+**Color Usage**:
+- Primary green: CTAs, success states, positive changes
+- Accent orange: Warnings, highlights, hover states
+- Gray: Text, borders, backgrounds
+- Red: Errors, negative changes, warnings
+
+**Typography**:
+- Headings: font-bold, text-2xl to text-5xl
+- Body: text-base, text-gray-700 dark:text-gray-300
+- Small text: text-sm, text-gray-500
+
+**Spacing**:
+- Consistent: p-4, p-6, p-8 for padding
+- Gap: gap-4, gap-6 for flexbox/grid spacing
+- Margins: mt-4, mb-6, etc.
+
+**Cards**:
+```
+bg-white dark:bg-gray-800
+rounded-lg
+shadow-md hover:shadow-lg
+transition-shadow duration-200
+border border-gray-200 dark:border-gray-700
+```
+
+**Buttons**:
+```
+// Primary
+bg-primary-500 hover:bg-primary-600
+text-white
+px-6 py-3
+rounded-lg
+font-semibold
+transition-colors
+
+// Secondary
+bg-accent-500 hover:bg-accent-600
+
+// Outline
+border-2 border-primary-500
+text-primary-500 hover:bg-primary-50
+```
+
+**Badges**:
+```
+// Status badges
+pending: bg-yellow-100 text-yellow-800
+processing: bg-blue-100 text-blue-800
+completed: bg-green-100 text-green-800
+failed: bg-red-100 text-red-800
+cancelled: bg-gray-100 text-gray-800
+```
+
+---
+
+## 🔔 Notifications & Feedback
+
+### Toast Messages (React Hot Toast)
+
+**Success**:
+- Coin created successfully
+- Trade executed
+- Coin scheduled
+- Settings saved
+
+**Error**:
+- Transaction failed
+- API error
+- Validation error
+- Network error
+
+**Info**:
+- Transaction pending
+- Processing...
+- Fetching data...
+
+**Warning**:
+- High slippage
+- Low balance
+- Expiring soon
+
+### Loading States
+
+**Skeleton Screens**:
+- Use for initial data loading
+- Match component shape
+- Pulse animation
+
+**Spinners**:
+- Button loading states
+- Inline loading
+- Full-page loading (rare)
+
+**Progress Indicators**:
+- Multi-step forms (create coin wizard)
+- Transaction status
+- Upload progress
+
+---
+
+## 📱 Responsive Design
+
+### Breakpoints (Tailwind)
+- `sm`: 640px (mobile landscape)
+- `md`: 768px (tablet)
+- `lg`: 1024px (small desktop)
+- `xl`: 1280px (desktop)
+- `2xl`: 1536px (large desktop)
+
+### Mobile Optimizations
+- Hamburger menu navigation
+- Bottom navigation bar (optional)
+- Simplified table → card views
+- Touch-friendly button sizes (min 44x44px)
+- Swipe gestures for carousels
+
+### Layout Patterns
+- Desktop: Side-by-side layouts (trade form, coin detail)
+- Tablet: Stacked with proper spacing
+- Mobile: Full-width, vertical stacking
+
+---
+
+## ♿ Accessibility
+
+### Requirements
+- Semantic HTML (header, nav, main, footer, article, section)
+- ARIA labels for icon buttons
+- Keyboard navigation support (Tab, Enter, Escape)
+- Focus indicators (ring-2 ring-primary-500)
+- Alt text for images
+- Color contrast ratio ≥ 4.5:1 (WCAG AA)
+- Screen reader announcements for dynamic content
+
+### Focus Management
+- Trap focus in modals
+- Restore focus after modal close
+- Skip to main content link
+
+---
+
+## 🚀 Performance Optimizations
+
+### Code Splitting
+- Lazy load routes with React.lazy
+- Dynamic imports for heavy components
+- Separate vendor bundles
+
+### Image Optimization
+- Use Next.js Image component (if using Next.js) or similar
+- Lazy load images below fold
+- WebP format with fallbacks
+- Responsive image sizes
+
+### API Optimization
+- Implement pagination (don't load all data)
+- Cache API responses (React Query)
+- Debounce search inputs (500ms)
+- Cancel pending requests on unmount
+
+### Bundle Size
+- Tree shaking
+- Remove unused dependencies
+- Minimize polyfills
+- Compress assets
+
+---
+
+## 🧪 Error Handling
+
+### API Errors
+
+**Network Errors**:
+```
+"Unable to connect to server. Please check your internet connection."
+```
+
+**Authentication Errors**:
+```
+"Your session has expired. Please sign in again."
+→ Redirect to auth flow
+```
+
+**Validation Errors**:
+```
+"Invalid wallet address format"
+"Amount exceeds balance"
+"Scheduled time must be at least 5 minutes in the future"
+→ Show inline error messages
+```
+
+**Transaction Errors**:
+```
+"Transaction failed: Insufficient gas"
+"User rejected transaction"
+→ Show error toast with retry option
+```
+
+### Error Boundaries
+- Wrap routes with error boundaries
+- Fallback UI for crashes
+- "Something went wrong" message
+- Reload button
+
+---
+
+## 🌍 Additional Features (Optional)
+
+### Favorites/Watchlist
+- Star icon on coin cards
+- Persist in localStorage or API
+- Dedicated watchlist page
+
+### Search
+- Global search bar in navbar
+- Search coins by name, symbol, or address
+- Search profiles by name or address
+- Recent searches
+
+### Notifications
+- Browser notifications for scheduled coins
+- Email notifications (requires backend)
+- In-app notification center
+
+### Charts & Analytics
+- Price charts (TradingView or Recharts)
+- Portfolio performance
+- Market statistics
+- Holder distribution charts
+
+### Social Features
+- Like/comment on coins
+- Follow creators
+- Share coin to Twitter, etc.
+- Referral system
+
+### Advanced Filters
+- Filter by market cap range
+- Filter by price range
+- Filter by volume
+- Sort by multiple criteria
+
+---
+
+## 📦 Project Setup Commands
+
+### Initialize Project
+```bash
+npm create vite@latest z-agent-frontend -- --template react-ts
+cd z-agent-frontend
+npm install
+```
+
+### Install Dependencies
+```bash
+# Core
+npm install react-router-dom @tanstack/react-query axios
+
+# Web3
+npm install @rainbow-me/rainbowkit wagmi viem@2.x
+
+# UI
+npm install tailwindcss postcss autoprefixer
+npm install lucide-react react-hot-toast
+npm install framer-motion
+npm install date-fns
+
+# Form
+npm install react-hook-form @hookform/resolvers zod
+
+# State (optional)
+npm install zustand
+
+# Charts (optional)
+npm install recharts
+```
+
+### Tailwind Config
+```bash
+npx tailwindcss init -p
+```
+
+Add custom colors to `tailwind.config.js`.
+
+---
+
+## 🔒 Security Considerations
+
+### Client-Side
+- Never store private keys
+- Validate all user inputs
+- Sanitize displayed data
+- Use HTTPS in production
+- Content Security Policy headers
+
+### API Communication
+- Always use HTTPS for API calls
+- Include JWT in Authorization header (not query params)
+- Handle token expiration gracefully
+- Implement request timeout (30 seconds)
+
+### Wallet Security
+- Use established libraries (RainbowKit, wagmi)
+- Verify transaction details before signing
+- Show transaction simulation/preview
+- Warn users about high-risk transactions
+
+---
+
+## 📖 Documentation for Developers
+
+### README.md
+Include:
+- Project overview
+- Tech stack
+- Installation instructions
+- Environment variables
+- Development commands
+- API endpoint list (summary)
+- Contributing guidelines
+
+### Environment Variables (.env)
+```
+VITE_API_BASE_URL=http://localhost:3000
+VITE_CHAIN_ID=8453
+VITE_WALLET_CONNECT_PROJECT_ID=your_project_id
+```
+
+### Code Comments
+- Explain complex logic
+- Document API response shapes
+- Note edge cases and limitations
+
+---
+
+## 🎯 Success Criteria
+
+### Functionality
+✅ All 37 API endpoints integrated  
+✅ Wallet connection works (RainbowKit)  
+✅ Authentication flow complete (SIWE + JWT)  
+✅ Create coin wizard functional  
+✅ Trading interface works  
+✅ Scheduler creates and manages scheduled coins  
+✅ Explore pages show data  
+✅ Profile pages load correctly  
+✅ Pagination works smoothly  
+
+### Design
+✅ Uses specified color palette  
+✅ Responsive on mobile, tablet, desktop  
+✅ Smooth animations and transitions  
+✅ Consistent styling throughout  
+✅ Accessible (WCAG AA)  
+
+### Performance
+✅ Initial load < 3 seconds  
+✅ Smooth scrolling and interactions  
+✅ Efficient data fetching (caching)  
+✅ Optimized images and assets  
+
+### User Experience
+✅ Intuitive navigation  
+✅ Clear error messages  
+✅ Loading states for async operations  
+✅ Success feedback for actions  
+✅ Help tooltips where needed  
+
+---
+
+## 🚀 Deployment Checklist
+
+### Pre-Deployment
+- [ ] Test all endpoints in production API
+- [ ] Update API base URL to production
+- [ ] Test wallet connection on target network
+- [ ] Verify environment variables
+- [ ] Run production build
+- [ ] Test build locally
+
+### Deployment
+- [ ] Deploy to Vercel/Netlify/hosting platform
+- [ ] Configure custom domain (optional)
+- [ ] Set up SSL certificate
+- [ ] Configure environment variables on hosting
+- [ ] Test deployed app
+
+### Post-Deployment
+- [ ] Monitor error tracking (Sentry, etc.)
+- [ ] Check analytics
+- [ ] Test all features in production
+- [ ] Gather user feedback
+
+---
+
+## 📞 Support & Resources
+
+### API Documentation
+- Backend Base URL: ` https://z-agent.onrender.com`
+- Health Check: `GET /health`
+- Full docs: See individual endpoint sections above
+
+### External Resources
+- **RainbowKit**: https://www.rainbowkit.com/
+- **wagmi**: https://wagmi.sh/
+- **viem**: https://viem.sh/
+- **TanStack Query**: https://tanstack.com/query/latest
+- **Tailwind CSS**: https://tailwindcss.com/
+- **Zora Docs**: https://docs.zora.co/
+
+### Example Repositories
+Look for:
+- Web3 dashboard examples
+- Trading interface examples
+- Wallet connection boilerplates
+
+---
+
+## 🎉 Final Notes
+
+This is a **comprehensive, production-ready web3 application** that integrates all 37 API endpoints. Focus on:
+
+1. **User Experience**: Make it intuitive and beautiful
+2. **Performance**: Fast loading and smooth interactions
+3. **Security**: Proper wallet handling and API authentication
+4. **Responsiveness**: Works perfectly on all devices
+5. **Accessibility**: Usable by everyone
+
+The color palette (green primary, orange accent) should make the app vibrant and modern. Use animations tastefully to enhance UX without overdoing it.
+
+
