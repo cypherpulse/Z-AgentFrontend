@@ -1,6 +1,13 @@
 import { formatDistanceToNow, format } from 'date-fns';
 
 // ============================================
+// CONSTANTS
+// ============================================
+
+export const PROFILE_BANNER_URL = 'https://res.cloudinary.com/dg5rr4ntw/image/upload/c_scale,f_auto,q_auto:good,w_1200/v1760302732/header-background_vvtlar.jpg';
+export const LOGO_URL = 'https://res.cloudinary.com/dg5rr4ntw/image/upload/c_scale,f_auto,q_auto:good,w_120/v1760304294/ChatGPT_Image_Oct_13_2025_12_23_36_AM_lplfpq.png';
+
+// ============================================
 // ADDRESS FORMATTING
 // ============================================
 

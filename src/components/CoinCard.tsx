@@ -33,14 +33,14 @@ export function CoinCard({
 
   return (
     <Link href={`/coin/${address}`} data-testid={`card-coin-${address}`}>
-      <Card className="hover-elevate active-elevate-2 cursor-pointer transition-all h-full">
+      <Card className="hover-elevate active-elevate-2 cursor-pointer transition-all h-full hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg hover:shadow-primary-100/50 dark:hover:shadow-primary-900/20">
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 dark:from-primary-900/30 dark:to-primary-950/30 flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-primary-200 dark:border-primary-800">
               {image && !imageError ? (
                 <>
                   {imageLoading && (
-                    <span className="font-mono font-bold text-primary text-lg">
+                    <span className="font-mono font-bold text-primary-600 dark:text-primary-400 text-lg">
                       {symbol.slice(0, 2).toUpperCase()}
                     </span>
                   )}
@@ -56,7 +56,7 @@ export function CoinCard({
                   />
                 </>
               ) : (
-                <span className="font-mono font-bold text-primary text-lg">
+                <span className="font-mono font-bold text-primary-600 dark:text-primary-400 text-lg">
                   {symbol.slice(0, 2).toUpperCase()}
                 </span>
               )}

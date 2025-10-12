@@ -12,7 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { CoinCard } from "@/components/CoinCard";
-import { formatAddress, formatNumber, formatTokenPrice, formatHolderBalance } from "@/lib/format";
+import { formatAddress, formatNumber, formatTokenPrice, formatHolderBalance, PROFILE_BANNER_URL } from "@/lib/format";
 import {
   ArrowLeft,
   ExternalLink,
@@ -254,9 +254,18 @@ export default function MyProfilePage() {
 
         {/* Profile Header - Enhanced Design */}
         <Card className="mb-6 overflow-hidden border-2">
-          <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-background" />
+          {/* Banner Image */}
+          <div className="relative h-48 md:h-64 w-full overflow-hidden">
+            <img 
+              src={PROFILE_BANNER_URL}
+              alt="Profile Banner"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
+          </div>
           <CardContent className="pt-0 px-6 pb-6">
-            <div className="flex flex-col md:flex-row items-start gap-6 -mt-16">
+            <div className="flex flex-col md:flex-row items-start gap-6 -mt-16 relative z-10">
               {/* Avatar with border */}
               <div className="relative">
                 <Avatar className="h-32 w-32 border-4 border-background shadow-xl ring-2 ring-primary/20">
@@ -431,19 +440,19 @@ export default function MyProfilePage() {
 
         {/* Stats Cards - Enhanced */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-            <CardHeader className="pb-3 bg-gradient-to-br from-blue-500/10 to-transparent">
+          <Card className="overflow-hidden border-2 hover:border-primary-400 transition-all hover:shadow-lg hover:shadow-primary-100 dark:hover:shadow-primary-900/20">
+            <CardHeader className="pb-3 bg-gradient-to-br from-primary-50 to-transparent dark:from-primary-950/30">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold text-muted-foreground">
                   Portfolio Market Cap
                 </CardTitle>
-                <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <Wallet className="h-5 w-5 text-blue-500" />
+                <div className="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <Wallet className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-2">
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
                 ${formatNumber(totalPortfolioMarketCap)}
               </div>
               <div className="flex items-center gap-2 mt-2">
@@ -455,19 +464,19 @@ export default function MyProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-            <CardHeader className="pb-3 bg-gradient-to-br from-purple-500/10 to-transparent">
+          <Card className="overflow-hidden border-2 hover:border-accent-400 transition-all hover:shadow-lg hover:shadow-accent-100 dark:hover:shadow-accent-900/20">
+            <CardHeader className="pb-3 bg-gradient-to-br from-accent-50 to-transparent dark:from-accent-950/30">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold text-muted-foreground">
                   Coins Created
                 </CardTitle>
-                <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <Coins className="h-5 w-5 text-purple-500" />
+                <div className="h-10 w-10 rounded-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center">
+                  <Coins className="h-5 w-5 text-accent-600 dark:text-accent-400" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-2">
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-accent-600 to-accent-400 bg-clip-text text-transparent">
                 {totalCoinsCreated}
               </div>
               <div className="flex items-center gap-2 mt-2">
@@ -480,19 +489,19 @@ export default function MyProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-            <CardHeader className="pb-3 bg-gradient-to-br from-green-500/10 to-transparent">
+          <Card className="overflow-hidden border-2 hover:border-primary-400 transition-all hover:shadow-lg hover:shadow-primary-100 dark:hover:shadow-primary-900/20">
+            <CardHeader className="pb-3 bg-gradient-to-br from-primary-50 to-transparent dark:from-primary-950/30">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold text-muted-foreground">
                   Creator Coin Value
                 </CardTitle>
-                <div className="h-10 w-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-green-500" />
+                <div className="h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="pt-2">
-              <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
                 {profile.creatorCoin
                   ? `$${formatNumber(creatorCoinMarketCap)}`
                   : "N/A"}

@@ -11,6 +11,37 @@ export default {
         sm: ".1875rem", /* 3px */
       },
       colors: {
+        // Custom brand colors
+        primary: {
+          50: '#f0fdf4',  // Very light green
+          100: '#dcfce7', // Light green
+          200: '#bbf7d0', // Soft green
+          300: '#86efac', // Bright green
+          400: '#4ade80', // Vibrant green
+          500: '#22c55e', // Core green (main primary color)
+          600: '#16a34a', // Darker green
+          700: '#15803d', // Deep green
+          800: '#166534', // Dark green
+          900: '#14532d', // Very dark green
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
+          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
+          border: "var(--primary-border)",
+        },
+        accent: {
+          50: '#fff7ed',  // Very light orange
+          100: '#ffedd5', // Light orange
+          200: '#fed7aa', // Soft orange
+          300: '#fdba74', // Warm orange
+          400: '#fb923c', // Bright orange
+          500: '#f97316', // Core orange (main accent color)
+          600: '#ea580c', // Darker orange
+          700: '#c2410c', // Deep orange
+          800: '#9a3412', // Dark orange
+          900: '#7c2d12', // Very dark orange
+          DEFAULT: "hsl(var(--accent) / <alpha-value>)",
+          foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
+          border: "var(--accent-border)",
+        },
         // Flat / base colors (regular buttons)
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
@@ -26,11 +57,6 @@ export default {
           foreground: "hsl(var(--popover-foreground) / <alpha-value>)",
           border: "hsl(var(--popover-border) / <alpha-value>)",
         },
-        primary: {
-          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
-          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
-          border: "var(--primary-border)",
-        },
         secondary: {
           DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
           foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
@@ -40,11 +66,6 @@ export default {
           DEFAULT: "hsl(var(--muted) / <alpha-value>)",
           foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
           border: "var(--muted-border)",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent) / <alpha-value>)",
-          foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
-          border: "var(--accent-border)",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive) / <alpha-value>)",

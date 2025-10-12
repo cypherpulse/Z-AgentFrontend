@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CoinCard } from "@/components/CoinCard";
-import { formatAddress, formatNumber, formatTokenPrice, formatHolderBalance } from "@/lib/format";
+import { formatAddress, formatNumber, formatTokenPrice, formatHolderBalance, PROFILE_BANNER_URL } from "@/lib/format";
 import {
   ArrowLeft,
   ExternalLink,
@@ -134,12 +134,18 @@ export default function ProfilePage() {
 
           {/* Profile Header Card */}
           <Card className="border-2 shadow-lg overflow-hidden">
-            {/* Gradient Background Banner */}
-            <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-accent/20 relative">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30" />
+            {/* Banner Image */}
+            <div className="relative h-48 md:h-64 w-full overflow-hidden">
+              <img 
+                src={PROFILE_BANNER_URL}
+                alt="Profile Banner"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
             </div>
 
-            <CardHeader className="-mt-16 relative">
+            <CardHeader className="-mt-16 relative z-10">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Avatar */}
                 <div className="relative">
