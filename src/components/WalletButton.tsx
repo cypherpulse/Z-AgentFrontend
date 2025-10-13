@@ -15,22 +15,22 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export function WalletButton() {
-  const { isAuthenticated, isAuthenticating, authenticate, logout } = useAuth();
+  const { address, isConnected } = useAuth();
   const [copied, setCopied] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
 
-  const handleCopyAddress = (address: string) => {
-    navigator.clipboard.writeText(address);
+  const handleCopyAddress = (addr: string) => {
+    navigator.clipboard.writeText(addr);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleMyProfileClick = () => {
-    if (!isAuthenticated) {
+    if (!address) {
       toast({
-        title: 'Sign in required',
-        description: 'Please sign in first to view your profile.',
+        title: 'Wallet not connected',
+        description: 'Please connect your wallet to view your profile.',
         variant: 'destructive',
       });
       return;
@@ -127,9 +127,6 @@ export function WalletButton() {
                       <Button variant="secondary" className="gap-2">
                         <Wallet className="h-4 w-4" />
                         {account.displayName}
-                        {isAuthenticated && (
-                          <div className="h-2 w-2 rounded-full bg-green-500" />
-                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
@@ -173,33 +170,9 @@ export function WalletButton() {
                       >
                         <User className="h-4 w-4" />
                         My Profile
-                        {!isAuthenticated && (
-                          <span className="ml-auto text-xs text-muted-foreground">Sign in first</span>
-                        )}
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
-
-                      {!isAuthenticated && (
-                        <DropdownMenuItem
-                          onClick={authenticate}
-                          disabled={isAuthenticating}
-                          className="gap-2"
-                        >
-                          <Wallet className="h-4 w-4" />
-                          {isAuthenticating ? "Signing..." : "Sign In"}
-                        </DropdownMenuItem>
-                      )}
-
-                      {isAuthenticated && (
-                        <DropdownMenuItem
-                          onClick={logout}
-                          className="gap-2 text-destructive focus:text-destructive"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          Sign Out
-                        </DropdownMenuItem>
-                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

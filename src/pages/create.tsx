@@ -7,21 +7,29 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, Upload, X, Loader2, Image as ImageIcon, Video } from "lucide-react";
 import { useState, useRef } from "react";
 import { uploadToCloudinary, getFilePreview } from "@/lib/cloudinary";
-import { useAuth } from "@/contexts/AuthContext";
 import { API_BASE_URL } from "@/lib/api";
 import { useLocation } from "wouter";
-import { useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
+import { useSendTransaction, useWaitForTransactionReceipt, useAccount } from "wagmi";
 
-interface CreateCoinPrepareResponse {
+interface TransactionData {
   to: `0x${string}`;
   data: `0x${string}`;
   value: string;
-  estimatedGas: string;
+  estimatedGas?: string;
+}
+
+interface CreateCoinPrepareResponse {
+  success: boolean;
+  data: {
+    transaction: TransactionData;
+  };
+  message?: string;
+  timestamp?: string;
 }
 
 export default function CreatePage() {
   const [, setLocation] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { address } = useAccount(); // Get wallet address from wagmi
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
@@ -39,6 +47,7 @@ export default function CreatePage() {
   const [previewType, setPreviewType] = useState<"image" | "video" | null>(null);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [deploymentCostEth, setDeploymentCostEth] = useState<string>("");
 
   // Wagmi hooks for transaction
   const { sendTransaction, data: txHash, isPending: isSendingTx } = useSendTransaction();
@@ -94,11 +103,9 @@ export default function CreatePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Get token from localStorage (where it's stored after auth)
-    const token = localStorage.getItem('authToken');
-    
-    if (!token) {
-      setError("Please connect your wallet and authenticate first");
+    // Check if wallet is connected
+    if (!address) {
+      setError("Please connect your wallet first");
       return;
     }
 
@@ -111,14 +118,16 @@ export default function CreatePage() {
     setError("");
 
     try {
-      // Step 1: Upload metadata to IPFS (via backend)
+      // Step 1: Upload metadata to IPFS (via backend) - NO AUTH REQUIRED
+      console.log("Uploading metadata to IPFS...");
       const metadataResponse = await fetch(`${API_BASE_URL}/api/write/upload-metadata`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          // ✅ No Authorization header needed!
         },
         body: JSON.stringify({
+          creator: address, // ✅ Add wallet address as creator
           name: formData.name,
           symbol: formData.symbol,
           description: formData.description,
@@ -132,16 +141,18 @@ export default function CreatePage() {
       }
 
       const metadataData = await metadataResponse.json();
-      console.log("Metadata uploaded:", metadataData);
+      console.log("✅ Metadata uploaded:", metadataData);
 
-      // Step 2: Prepare create coin transaction
+      // Step 2: Prepare create coin transaction - NO AUTH REQUIRED
+      console.log("Preparing transaction...");
       const prepareResponse = await fetch(`${API_BASE_URL}/api/write/create-coin/prepare`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          // ✅ No Authorization header needed!
         },
         body: JSON.stringify({
+          creator: address, // ✅ Add wallet address as creator
           name: formData.name,
           symbol: formData.symbol,
           description: formData.description,
@@ -157,17 +168,26 @@ export default function CreatePage() {
         throw new Error(errorData.error || "Failed to prepare transaction");
       }
 
-      const txData: CreateCoinPrepareResponse = await prepareResponse.json();
-      console.log("Transaction prepared:", txData);
+      const txData = await prepareResponse.json();
+      console.log("✅ Transaction prepared:", txData);
 
-      // Step 3: Send transaction via wagmi
+      // Extract transaction data from response (backend returns { success, data: { transaction: {...} } })
+      const transaction = txData.data?.transaction || txData.data || txData;
+
+      // Convert value from wei to ETH for display
+      const valueWei = transaction.value || "0";
+      const valueEth = (Number(valueWei) / 1e18).toString();
+      setDeploymentCostEth(valueEth);
+
+      // Step 3: Send transaction via wagmi with safe value handling
       sendTransaction({
-        to: txData.to,
-        data: txData.data,
-        value: BigInt(txData.value),
+        to: transaction.to,
+        data: transaction.data,
+        value: BigInt(valueWei), // ✅ Handle undefined/missing value
       });
 
     } catch (err) {
+      console.error("❌ Create coin error:", err);
       setError(err instanceof Error ? err.message : "Failed to create coin");
       setCreating(false);
     }
@@ -366,7 +386,7 @@ export default function CreatePage() {
                     size="lg"
                     className="w-full"
                     data-testid="button-create-coin"
-                    disabled={isProcessing || !isAuthenticated}
+                    disabled={isProcessing || !address}
                   >
                     {isProcessing ? (
                       <>
@@ -382,7 +402,7 @@ export default function CreatePage() {
                     )}
                   </Button>
 
-                  {!isAuthenticated && (
+                  {!address && (
                     <p className="text-sm text-center text-muted-foreground">
                       Please connect your wallet to create a coin
                     </p>
@@ -444,17 +464,16 @@ export default function CreatePage() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Gas Fee (est.)</span>
-                  <span className="font-medium">~0.002 ETH</span>
+                  <span className="text-muted-foreground">Total Cost</span>
+                  <span className="font-medium">
+                    {deploymentCostEth
+                      ? `${deploymentCostEth} ETH`
+                      : "--"}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Platform Fee</span>
-                  <span className="font-medium">0.001 ETH</span>
-                </div>
-                <div className="pt-2 border-t flex justify-between font-bold">
-                  <span>Total</span>
-                  <span>~0.003 ETH</span>
-                </div>
+                {deploymentCostEth === "" && (
+                  <div className="text-xs text-muted-foreground">Cost will appear after preparing transaction.</div>
+                )}
               </CardContent>
             </Card>
           </div>

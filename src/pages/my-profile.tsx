@@ -40,8 +40,7 @@ import { CHAIN_ID } from "@/lib/api";
 
 export default function MyProfilePage() {
   const [, navigate] = useLocation();
-  const { address, isConnected } = useAccount();
-  const { isAuthenticated, user } = useAuth();
+  const { address, isConnected } = useAuth(); // Use only wallet address and connection
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("portfolio");
 
@@ -66,8 +65,8 @@ export default function MyProfilePage() {
     isFetchingNextPage: isFetchingMoreBalances,
   } = useProfileBalances(address || "", { count: 12 });
 
-  // Show authentication required state
-  if (!isConnected || !isAuthenticated) {
+  // Show wallet connection required state
+  if (!isConnected || !address) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -79,26 +78,13 @@ export default function MyProfilePage() {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
-
-          <Card className="max-w-2xl mx-auto mt-20">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-                <Wallet className="h-10 w-10 text-muted-foreground" />
-              </div>
-              <CardTitle className="text-2xl">Connect Your Wallet</CardTitle>
-              <CardDescription>
-                Please connect and sign in with your wallet to view your profile
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center pb-8">
-              <p className="text-sm text-muted-foreground mb-6">
-                You need to connect your wallet and sign in to access your profile page.
-              </p>
-              <Button onClick={() => navigate("/")} size="lg">
-                Go to Home
-              </Button>
-            </CardContent>
-          </Card>
+          <Alert variant="destructive">
+            <AlertCircle className="h-5 w-5 text-red-500" />
+            <AlertTitle>Wallet not connected</AlertTitle>
+            <AlertDescription>
+              Please connect your wallet to view your profile.
+            </AlertDescription>
+          </Alert>
         </div>
       </div>
     );
