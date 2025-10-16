@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 
 // API Configuration from environment variables
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://z-agent.onrender.com';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const CHAIN_ID = parseInt(import.meta.env.VITE_CHAIN_ID || '8453', 10); // Base chain
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '30000', 10);
 const AUTH_TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || 'auth_token';
@@ -640,18 +640,27 @@ export const updatePayoutRecipient = async (params: {
 // SCHEDULER ENDPOINTS
 // ============================================
 
-export const scheduleCoin = async (
-  params: {
-    scheduledFor: string;
+export const scheduleCoin = async (payload: {
+  walletAddress: string;
+  scheduledFor: string;
+  coinParams: {
+    name: string;
+    symbol: string;
     metadataUri: string;
-    maxRetries?: number;
-  } & Omit<CreateCoinParams, 'description' | 'imageUri'>
-) => {
-  const { data } = await apiClient.post<ApiResponse<ScheduledCoin>>(
-    '/api/scheduler/schedule',
-    { ...params, chainId: CHAIN_ID }
-  );
-  return data.data;
+    currency: string;
+    chainId: number;
+    startingMarketCap: string;
+    additionalOwners: string[];
+  };
+  transaction: {
+    to: string;
+    data: string;
+    value: string;
+  };
+  maxRetries?: number;
+}) => {
+  const { data } = await apiClient.post('/api/scheduler/schedule', payload);
+  return data;
 };
 
 export const getScheduledCoins = async (params?: {
