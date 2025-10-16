@@ -1,26 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Info,
-  Upload,
-  X,
+  Plus,
   Loader2,
   Image as ImageIcon,
   Video,
   Calendar,
   Clock,
-  Plus,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { uploadToCloudinary, getFilePreview } from "@/lib/cloudinary";
 import { API_BASE_URL, scheduleCoin } from "@/lib/api";
+import ScheduleForm from "./schedule/ScheduleForm";
+import ScheduledCoinList from "./schedule/ScheduledCoinList";
+import ScheduledCoinsViewer from "../components/ScheduledCoinsViewer";
 
 // Helper: fetch scheduled coins for wallet
 async function getScheduledCoins(walletAddress: string) {
@@ -32,7 +29,6 @@ async function getScheduledCoins(walletAddress: string) {
 
 export default function SchedulePage() {
   const { address } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [scheduledCoins, setScheduledCoins] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -82,39 +78,6 @@ export default function SchedulePage() {
       }
     })();
   }, [address, showForm, success]);
-
-  // File upload logic (same as create.tsx)
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setError("");
-    setUploading(true);
-    setUploadProgress(0);
-    try {
-      const preview = await getFilePreview(file);
-      setPreviewUrl(preview);
-      setPreviewType(file.type.startsWith("video/") ? "video" : "image");
-      const response = await uploadToCloudinary(file, (progress) => {
-        setUploadProgress(progress.percentage);
-      });
-      setFormData({ ...formData, imageUri: response.secure_url });
-      setPreviewUrl(response.secure_url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
-      setPreviewUrl("");
-      setPreviewType(null);
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
-    }
-  };
-
-  const handleClearMedia = () => {
-    setFormData({ ...formData, imageUri: "" });
-    setPreviewUrl("");
-    setPreviewType(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
 
   // Schedule coin creation (deferred execution, new backend spec)
   const handleSchedule = async (e: React.FormEvent) => {
@@ -219,6 +182,8 @@ export default function SchedulePage() {
         coinParams: {
           name: formData.name,
           symbol: formData.symbol,
+          description: formData.description, // Ensure description is included
+          imageUri: formData.imageUri, // Include image URI
           metadataUri: metadataUri || "https://default-metadata.com",
           currency: formData.currency,
           chainId: 8453,
@@ -257,6 +222,9 @@ export default function SchedulePage() {
       setSubmitting(false);
     }
   };
+
+  const walletAddress = address || ""; // Use the address from auth context
+  const jwtToken = ""; // Replace with actual JWT token if available
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -310,229 +278,28 @@ export default function SchedulePage() {
                   <CardTitle>Schedule New Coin</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSchedule} className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Coin Name *</Label>
-                      <Input
-                        id="name"
-                        placeholder="e.g., My Creator Coin"
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="symbol">Symbol *</Label>
-                      <Input
-                        id="symbol"
-                        placeholder="e.g., MCC"
-                        value={formData.symbol}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            symbol: e.target.value.toUpperCase(),
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Tell people about your coin..."
-                        value={formData.description}
-                        onChange={(e) =>
-                          setFormData({ ...formData, description: e.target.value })
-                        }
-                        rows={4}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="image">Media (Image or Video)</Label>
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <Input
-                            id="image"
-                            type="url"
-                            placeholder="Or paste image/video URL"
-                            value={formData.imageUri}
-                            onChange={(e) => {
-                              setFormData({
-                                ...formData,
-                                imageUri: e.target.value,
-                              });
-                              if (e.target.value) {
-                                setPreviewUrl(e.target.value);
-                                setPreviewType(
-                                  e.target.value.match(/\.(mp4|webm|ogg|mov)$/i)
-                                    ? "video"
-                                    : "image"
-                                );
-                              }
-                            }}
-                            disabled={uploading || submitting}
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploading || submitting}
-                          >
-                            {uploading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Upload className="h-4 w-4" />
-                            )}
-                          </Button>
-                          {(previewUrl || formData.imageUri) && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={handleClearMedia}
-                              disabled={uploading || submitting}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*,video/*"
-                          onChange={handleFileSelect}
-                          className="hidden"
-                        />
-                        {uploading && (
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs text-muted-foreground">
-                              <span>Uploading...</span>
-                              <span>{uploadProgress}%</span>
-                            </div>
-                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-primary transition-all duration-300"
-                                style={{ width: `${uploadProgress}%` }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                        {previewUrl && previewType && (
-                          <div className="border rounded-lg p-2">
-                            {previewType === "video" ? (
-                              <video
-                                src={previewUrl}
-                                controls
-                                className="w-full h-48 object-contain rounded"
-                              />
-                            ) : (
-                              <img
-                                src={previewUrl}
-                                alt="Preview"
-                                className="w-full h-48 object-contain rounded"
-                              />
-                            )}
-                          </div>
-                        )}
-                        <p className="text-xs text-muted-foreground flex items-center gap-2">
-                          <ImageIcon className="h-3 w-3" />
-                          Images: 512x512px recommended (max 10MB)
-                          <Video className="h-3 w-3 ml-2" />
-                          Videos: max 100MB
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="scheduledFor">Schedule Date & Time *</Label>
-                      <Input
-                        id="scheduledFor"
-                        type="datetime-local"
-                        value={formData.scheduledFor}
-                        onChange={(e) =>
-                          setFormData({ ...formData, scheduledFor: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full"
-                      disabled={submitting || !address}
-                    >
-                      {submitting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        "Schedule Coin"
-                      )}
-                    </Button>
-                    {!address && (
-                      <p className="text-sm text-center text-muted-foreground">
-                        Please connect your wallet to schedule a coin
-                      </p>
-                    )}
-                  </form>
+                  <ScheduleForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleSchedule={handleSchedule}
+                    uploading={uploading}
+                    setUploading={setUploading}
+                    uploadProgress={uploadProgress}
+                    setUploadProgress={setUploadProgress}
+                    previewUrl={previewUrl}
+                    setPreviewUrl={setPreviewUrl}
+                    previewType={previewType}
+                    setPreviewType={setPreviewType}
+                    submitting={submitting}
+                    setError={setError}
+                    address={address || undefined} // Ensure address is passed as string | undefined
+                  />
                 </CardContent>
               </Card>
             )}
 
-            <div className="grid gap-4">
-              {loading ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  Loading scheduled coins...
-                </div>
-              ) : scheduledCoins.length > 0 ? (
-                scheduledCoins.map((coin) => (
-                  <Card
-                    key={coin.id}
-                    className="hover-elevate active-elevate-2 cursor-pointer"
-                  >
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-chart-2/20 to-chart-2/5 flex items-center justify-center">
-                          <span className="font-mono font-bold text-chart-2 text-lg">
-                            {coin.symbol.slice(0, 2)}
-                          </span>
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg">{coin.name}</CardTitle>
-                          <p className="text-sm text-muted-foreground font-mono">
-                            {coin.symbol}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="secondary">{coin.status}</Badge>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          Scheduled{" "}
-                          {formatDistanceToNow(new Date(coin.scheduledFor), {
-                            addSuffix: true,
-                          })}
-                        </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          Created{" "}
-                          {formatDistanceToNow(new Date(coin.createdAt), {
-                            addSuffix: true,
-                          })}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  No scheduled coins found.
-                </div>
-              )}
-            </div>
+            <ScheduledCoinList scheduledCoins={scheduledCoins} loading={loading} />
+            <ScheduledCoinsViewer walletAddress={walletAddress} jwtToken={jwtToken} />
           </>
         )}
       </div>
