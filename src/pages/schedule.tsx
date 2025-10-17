@@ -182,8 +182,6 @@ export default function SchedulePage() {
         coinParams: {
           name: formData.name,
           symbol: formData.symbol,
-          description: formData.description, // Ensure description is included
-          imageUri: formData.imageUri, // Include image URI
           metadataUri: metadataUri || "https://default-metadata.com",
           currency: formData.currency,
           chainId: 8453,
