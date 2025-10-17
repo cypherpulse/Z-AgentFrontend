@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ScheduledCoinCard from "./ScheduledCoinCard";
+import { getScheduledCoins } from "@/lib/api";
 
 interface CoinParams {
   name: string;
@@ -24,20 +25,9 @@ const ScheduledCoinsViewer: React.FC<{ walletAddress: string; jwtToken: string }
     const fetchScheduledCoins = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:3000/api/scheduler/scheduled-coins?walletAddress=${walletAddress}`,
-          {
-            headers: {
-              Authorization: `Bearer ${jwtToken}`,
-            },
-          }
-        );
+        const response = await getScheduledCoins({ walletAddress });
 
-        if (response.data.success) {
-          setScheduledCoins(response.data.data.scheduledCoins);
-        } else {
-          setError(response.data.message || "Failed to fetch scheduled coins.");
-        }
+        setScheduledCoins(response.scheduledCoins);
       } catch (err) {
         setError("An error occurred while fetching scheduled coins.");
       } finally {
@@ -47,6 +37,18 @@ const ScheduledCoinsViewer: React.FC<{ walletAddress: string; jwtToken: string }
 
     fetchScheduledCoins();
   }, [walletAddress, jwtToken]);
+
+  const handleActionComplete = async () => {
+    try {
+      setLoading(true);
+      const response = await getScheduledCoins({ walletAddress });
+      setScheduledCoins(response.scheduledCoins);
+    } catch (err) {
+      setError("An error occurred while fetching scheduled coins.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <div>Loading scheduled coins...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -67,9 +69,8 @@ const ScheduledCoinsViewer: React.FC<{ walletAddress: string; jwtToken: string }
               image={coin.coinParams.metadataUri}
               scheduledFor={coin.scheduledFor}
               status={coin.status}
-              onExecute={(id) => console.log(`Execute ${id}`)}
-              onEdit={(id) => console.log(`Edit ${id}`)}
-              onDelete={(id) => console.log(`Delete ${id}`)}
+              jwtToken={jwtToken}
+              onActionComplete={handleActionComplete} // Pass the handler to child
             />
           ))}
         </div>
