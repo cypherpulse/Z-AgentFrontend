@@ -29,7 +29,7 @@ function Router() {
       <Route path="/explore" component={ExplorePage} />
       <Route path="/creator-coins" component={CreatorCoinsPage} />
       <Route path="/coin/:address" component={CoinDetailPage} />
-      <Route path="/trade" component={TradePage} />
+      {/* <Route path="/trade" component={TradePage} /> */}
       <Route path="/create" component={CreatePage} />
       <Route path="/schedule" component={SchedulePage} />
       <Route path="/my-profile" component={MyProfilePage} />

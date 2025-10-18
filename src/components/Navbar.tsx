@@ -20,7 +20,7 @@ export function Navbar() {
     { href: "/", label: "Home" },
     { href: "/explore", label: "Explore" },
     { href: "/creator-coins", label: "Creator Coins" },
-    { href: "/trade", label: "Trade" },
+    // { href: "/trade", label: "Trade" },
     { href: "/create", label: "Create" },
     { href: "/schedule", label: "Schedule" },
   ];
