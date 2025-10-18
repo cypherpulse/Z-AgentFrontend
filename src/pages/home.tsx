@@ -17,12 +17,12 @@ export default function HomePage() {
 
   // Calculate stats from real data (backend returns values already formatted)
   const totalMarketCap = allCoins.reduce(
-    (sum, coin) => sum + safeParseNumber(coin.marketCap),
+    (sum: number, coin: { marketCap: string }) => sum + safeParseNumber(coin.marketCap),
     0
   );
-  const totalHolders = allCoins.reduce((sum, coin) => sum + (coin.uniqueHolders || coin.holders || 0), 0);
+  const totalHolders = allCoins.reduce((sum: number, coin: { uniqueHolders?: number; holders?: number }) => sum + (coin.uniqueHolders || coin.holders || 0), 0);
   const totalVolume = allCoins.reduce(
-    (sum, coin) => sum + safeParseNumber(coin.volume24h),
+    (sum: number, coin: { volume24h: string }) => sum + safeParseNumber(coin.volume24h),
     0
   );
 
@@ -90,7 +90,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {trendingCoins.map((coin) => {
+            {trendingCoins.map((coin: any) => {
               const priceInUsdc = coin.tokenPrice?.priceInUsdc || '0';
               const formattedPrice = formatTokenPrice(priceInUsdc, '$');
               
@@ -119,6 +119,7 @@ export default function HomePage() {
                   priceChange24h={priceChange}
                   marketCap={marketCapFormatted}
                   holders={coin.uniqueHolders || coin.holders || 0}
+                  volume24h={coin.volume24h} // Added missing prop
                 />
               );
             })}

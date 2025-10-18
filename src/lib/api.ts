@@ -663,14 +663,16 @@ export const scheduleCoin = async (payload: {
   return data;
 };
 
-export const getScheduledCoins = async (params?: {
-  status?: string;
-  limit?: number;
-  skip?: number;
+export const getScheduledCoins = async (params: {
+  walletAddress: string; // Make walletAddress required
+  jwtToken: string; // Make jwtToken required
 }) => {
   const { data } = await apiClient.get<
     ApiResponse<{ scheduledCoins: ScheduledCoin[]; total: number; hasMore: boolean }>
-  >('/api/scheduler/scheduled-coins', { params });
+  >(`/api/scheduler/scheduled-coins`, {
+    params: { walletAddress: params.walletAddress }, // Only include walletAddress in query params
+    headers: { Authorization: `Bearer ${params.jwtToken}` }, // Always include Authorization header
+  });
   return data.data;
 };
 

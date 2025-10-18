@@ -568,6 +568,7 @@ export default function MyProfilePage() {
                         priceChange24h={parseFloat(balance.coin.marketCapDelta24h || "0")}
                         marketCap={formatNumber(parseFloat(balance.coin.marketCap || "0"))}
                         holders={balance.coin.uniqueHolders || balance.coin.holders || 0}
+                        volume24h={balance.coin.volume24h} // Added missing prop
                       />
                     );
                   })}
@@ -639,6 +640,7 @@ export default function MyProfilePage() {
                         priceChange24h={parseFloat(coin.marketCapDelta24h || "0")}
                         marketCap={formatNumber(parseFloat(coin.marketCap || "0"))}
                         holders={coin.uniqueHolders || coin.holders || 0}
+                        volume24h={coin.volume24h} // Added missing prop
                       />
                     );
                   })}

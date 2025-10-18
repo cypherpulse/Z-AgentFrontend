@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { formatCurrency } from "@/lib/format"; // Import currency formatter
 
 interface CoinCardProps {
   address: string;
@@ -13,6 +14,7 @@ interface CoinCardProps {
   priceChange24h?: number; // Make optional
   marketCap: string;
   holders: number;
+  volume24h: string; // Added 24h volume
   isNew?: boolean;
 }
 
@@ -25,6 +27,7 @@ export function CoinCard({
   priceChange24h,
   marketCap,
   holders,
+  volume24h, // Destructure 24h volume
   isNew,
 }: CoinCardProps) {
   const isPositive = (priceChange24h || 0) >= 0;
@@ -71,8 +74,8 @@ export function CoinCard({
         <CardContent className="space-y-3">
           <div className="flex items-baseline justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-muted-foreground">Price</p>
-              <p className="text-lg font-bold font-mono truncate" data-testid={`text-price-${address}`}>{price}</p>
+              <p className="text-sm text-muted-foreground">Market Cap</p>
+              <p className="text-lg font-bold font-mono truncate" data-testid={`text-market-cap-${address}`}>{marketCap}</p>
             </div>
             {priceChange24h !== undefined && (
               <div className={`flex items-center gap-1 flex-shrink-0 ${isPositive ? "text-primary" : "text-destructive"}`}>
@@ -83,8 +86,8 @@ export function CoinCard({
           </div>
           <div className="grid grid-cols-2 gap-4 pt-2 border-t">
             <div>
-              <p className="text-xs text-muted-foreground">Market Cap</p>
-              <p className="text-sm font-semibold">{marketCap}</p>
+              <p className="text-xs text-muted-foreground">24h Volume</p>
+              <p className="text-sm font-semibold">{formatCurrency(volume24h)}</p> {/* Format volume in dollars */}
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Holders</p>

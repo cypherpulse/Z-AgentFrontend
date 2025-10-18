@@ -164,6 +164,7 @@ function TabContent({
                   marketCap={marketCapFormatted}
                   holders={coin.uniqueHolders || coin.holders || 0}
                   isNew={value === "new-creators"}
+                  volume24h={coin.volume24h} // Added missing prop
                 />
               );
             })}

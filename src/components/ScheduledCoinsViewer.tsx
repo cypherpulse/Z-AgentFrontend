@@ -23,13 +23,31 @@ const ScheduledCoinsViewer: React.FC<{ walletAddress: string; jwtToken: string }
 
   useEffect(() => {
     const fetchScheduledCoins = async () => {
+      if (!walletAddress) {
+        setError("Wallet address is missing. Please provide a valid wallet address.");
+        return;
+      }
+
       try {
         setLoading(true);
-        const response = await getScheduledCoins({ walletAddress });
+        console.log("Fetching scheduled coins for wallet:", walletAddress); // Debugging log
+        const response = await getScheduledCoins({
+          walletAddress, // Pass walletAddress
+          jwtToken, // Pass jwtToken
+        });
+
+        if (!response || typeof response !== "object") {
+          throw new Error("Invalid response format. Expected JSON.");
+        }
 
         setScheduledCoins(response.scheduledCoins);
       } catch (err) {
-        setError("An error occurred while fetching scheduled coins.");
+        console.error("Error fetching scheduled coins:", err); // Debugging log
+        if (err instanceof SyntaxError) {
+          setError("Unexpected response format from server. Please try again later.");
+        } else {
+          setError("An error occurred while fetching scheduled coins.");
+        }
       } finally {
         setLoading(false);
       }
@@ -41,7 +59,10 @@ const ScheduledCoinsViewer: React.FC<{ walletAddress: string; jwtToken: string }
   const handleActionComplete = async () => {
     try {
       setLoading(true);
-      const response = await getScheduledCoins({ walletAddress });
+      const response = await getScheduledCoins({
+        walletAddress, // Pass walletAddress
+        jwtToken, // Pass jwtToken
+      }); // Removed status and limit to fetch all coins
       setScheduledCoins(response.scheduledCoins);
     } catch (err) {
       setError("An error occurred while fetching scheduled coins.");

@@ -169,6 +169,7 @@ function TabContent({
                   marketCap={marketCapFormatted}
                   holders={coin.uniqueHolders || coin.holders || 0}
                   isNew={false}
+                  volume24h={coin.volume24h} // Added missing prop
                 />
               );
             })}

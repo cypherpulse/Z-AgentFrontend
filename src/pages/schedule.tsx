@@ -60,15 +60,28 @@ export default function SchedulePage() {
         const response = await fetch(
           `/api/scheduler/scheduled-coins?${params}`
         );
+        const contentType = response.headers.get("content-type");
         if (!response.ok) {
           const errorText = await response.text();
+          console.error("API error response:", errorText); // Debugging log
           setError(`API error: ${response.status} ${errorText}`);
           setScheduledCoins([]);
           return;
         }
+        if (!contentType || !contentType.includes("application/json")) {
+          const rawText = await response.text();
+          console.error("Non-JSON response:", rawText); // Debugging log
+          throw new Error("Invalid response format. Expected JSON.");
+        }
         const result = await response.json();
+        if (!result || typeof result !== "object" || !Array.isArray(result.data)) {
+          throw new Error("Invalid response format. Expected JSON with a data array.");
+        }
+        console.log("Fetched scheduled coins:", result.data); // Debugging log
         setScheduledCoins(result.data || []);
+        setError(""); // Clear any previous errors
       } catch (err) {
+        console.error("Network or parsing error:", err); // Debugging log
         setError(
           `Network error: ${err instanceof Error ? err.message : String(err)}`
         );
@@ -258,16 +271,17 @@ export default function SchedulePage() {
               </Button>
             </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
+
+
+            {!loading && !error && scheduledCoins.length === 0 && (
+              <p>No scheduled coins found.</p>
             )}
-            {success && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>Coin scheduled successfully!</AlertDescription>
-              </Alert>
+
+            {!loading && !error && scheduledCoins.length > 0 && (
+              <>
+                <h2 className="text-2xl font-bold">Scheduled Coins</h2>
+                <ScheduledCoinList scheduledCoins={scheduledCoins} loading={loading} />
+              </>
             )}
 
             {showForm && (
@@ -296,7 +310,6 @@ export default function SchedulePage() {
               </Card>
             )}
 
-            <ScheduledCoinList scheduledCoins={scheduledCoins} loading={loading} />
             <ScheduledCoinsViewer walletAddress={walletAddress} jwtToken={jwtToken} />
           </>
         )}

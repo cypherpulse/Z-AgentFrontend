@@ -492,6 +492,7 @@ export default function ProfilePage() {
                           priceChange24h={marketCapDelta}
                           marketCap={`$${formatNumber(parseFloat(coin.marketCap || "0"), 2)}`}
                           holders={coin.uniqueHolders || 0}
+                          volume24h={coin.volume24h} // Added missing prop
                         />
                       );
                     })}
