@@ -720,6 +720,20 @@ export const executeScheduledCoin = async (params: {
   return data.data;
 };
 
+export const getScheduledCoinTransactionData = async (params: {
+  id: string;
+  walletAddress: string;
+  jwtToken: string;
+}) => {
+  const { data } = await apiClient.get<
+    ApiResponse<{ to: string; data: string; value: string; chainId: number }>
+  >(`/api/scheduler/scheduled-coins/${params.id}/transaction-data`, {
+    params: { walletAddress: params.walletAddress },
+    headers: { Authorization: `Bearer ${params.jwtToken}` },
+  });
+  return data.data;
+};
+
 // ============================================
 // PROFILE ENDPOINTS
 // ============================================
