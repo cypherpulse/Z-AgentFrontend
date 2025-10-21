@@ -1,9 +1,11 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, TrendingDown, Star, StarOff } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
-import { formatCurrency } from "@/lib/format"; // Import currency formatter
+import { formatCurrency } from "@/lib/format";
+import { useWatchlist } from "@/hooks/use-watchlist";
 
 interface CoinCardProps {
   address: string;
@@ -33,6 +35,23 @@ export function CoinCard({
   const isPositive = (priceChange24h || 0) >= 0;
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
+
+  const handleWatchlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isInWatchlist(address)) {
+      removeFromWatchlist(address);
+    } else {
+      addToWatchlist({
+        address,
+        name,
+        symbol,
+        image
+      });
+    }
+  };
 
   return (
     <Link href={`/coin/${address}`} data-testid={`card-coin-${address}`}>
@@ -69,7 +88,21 @@ export function CoinCard({
               <p className="text-sm text-muted-foreground font-mono">{symbol}</p>
             </div>
           </div>
-          {isNew && <Badge variant="secondary">NEW</Badge>}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleWatchlistToggle}
+              className="h-8 w-8 hover:bg-primary-100 dark:hover:bg-primary-900/30"
+            >
+              {isInWatchlist(address) ? (
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              ) : (
+                <StarOff className="h-4 w-4 text-muted-foreground hover:text-yellow-400" />
+              )}
+            </Button>
+            {isNew && <Badge variant="secondary">NEW</Badge>}
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-baseline justify-between gap-2">

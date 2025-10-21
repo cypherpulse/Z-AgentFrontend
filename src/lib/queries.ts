@@ -324,7 +324,20 @@ export const useScheduledCoins = (params?: {
 }) => {
   return useQuery({
     queryKey: queryKeys.scheduledCoins(params),
-    queryFn: () => api.getScheduledCoins(params),
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token');
+      if (!token) throw new Error('No auth token');
+
+      // For now, we'll need to get wallet address from current user
+      // This is a temporary solution - ideally the API should handle this
+      const userResponse = await api.getCurrentUser();
+      const walletAddress = userResponse.walletAddress;
+
+      return api.getScheduledCoins({
+        walletAddress,
+        jwtToken: token
+      });
+    },
     enabled: !!localStorage.getItem('auth_token'),
     staleTime: 30000, // 30 seconds
     refetchInterval: 30000, // Auto-refetch every 30 seconds

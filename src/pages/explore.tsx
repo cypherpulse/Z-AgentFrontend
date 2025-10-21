@@ -35,22 +35,22 @@ export default function ExplorePage() {
         <Button
           variant="ghost"
           onClick={() => window.history.back()}
-          className="group hover:bg-primary-50 dark:hover:bg-primary-950/20 hover:text-primary-700 dark:hover:text-primary-300 -ml-2"
+          className="group hover:bg-accent -ml-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back
         </Button>
 
         <div>
-          <h1 className="text-4xl font-bold font-serif bg-gradient-to-r from-primary-700 to-accent-600 bg-clip-text text-transparent">Explore Coins</h1>
+          <h1 className="text-4xl font-bold font-serif">Explore Coins</h1>
           <p className="text-muted-foreground mt-2">Discover trending creator coins on Base</p>
         </div>
 
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search coins..."
-            className="pl-10 border-2 border-primary-200 dark:border-primary-800 focus:border-primary-400 dark:focus:border-primary-600 focus:ring-primary-400"
+            className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             data-testid="input-search-coins"
@@ -58,13 +58,13 @@ export default function ExplorePage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-2 bg-primary-50 dark:bg-primary-950/20 border-2 border-primary-200 dark:border-primary-800">
+          <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-2">
             {categories.map((cat) => (
               <TabsTrigger
                 key={cat.value}
                 value={cat.value}
                 data-testid={`tab-${cat.value}`}
-                className="data-[state=active]:bg-primary-600 data-[state=active]:text-white dark:data-[state=active]:bg-primary-500 data-[state=active]:shadow-md transition-all"
+                className="gap-2"
               >
                 {cat.label}
               </TabsTrigger>
