@@ -140,11 +140,11 @@ const ScheduledCoinCard: React.FC<ScheduledCoinCardProps> = ({
   };
 
   return (
-    <Card className="relative hover:shadow-lg transition-shadow border border-primary-300 bg-primary-50 dark:bg-primary-900">
+    <Card className="hover-elevate active-elevate-2 cursor-pointer transition-all h-full hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg hover:shadow-primary-100/50 dark:hover:shadow-primary-900/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 dark:from-primary-900/30 dark:to-primary-950/30 flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-primary-200 dark:border-primary-800">
               {image ? (
                 <img
                   src={image}
@@ -152,22 +152,22 @@ const ScheduledCoinCard: React.FC<ScheduledCoinCardProps> = ({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-lg font-bold text-gray-500">
+                <span className="font-mono font-bold text-primary-600 dark:text-primary-400 text-lg">
                   {symbol.slice(0, 2).toUpperCase()}
                 </span>
               )}
             </div>
             <div>
-              <h3 className="font-semibold text-lg text-primary-700 dark:text-primary-200">
+              <h3 className="font-semibold text-lg">
                 {name}
               </h3>
-              <p className="text-sm text-gray-500">{symbol}</p>
+              <p className="text-sm text-muted-foreground font-mono">{symbol}</p>
             </div>
           </div>
           <Menu
             menuButton={
-              <MenuButton className="p-2 rounded-full hover:bg-gray-100">
-                <MoreVertical className="w-5 h-5 text-primary-700 dark:text-primary-200" />
+              <MenuButton className="p-2 rounded-full hover:bg-muted">
+                <MoreVertical className="w-5 h-5" />
               </MenuButton>
             }
           >
@@ -180,8 +180,8 @@ const ScheduledCoinCard: React.FC<ScheduledCoinCardProps> = ({
       <CardContent>
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-gray-500">Scheduled For</p>
-            <p className="text-md font-medium text-primary-700 dark:text-primary-200">
+            <p className="text-sm text-muted-foreground">Scheduled For</p>
+            <p className="text-md font-medium">
               {new Date(scheduledFor).toLocaleString()}
             </p>
           </div>

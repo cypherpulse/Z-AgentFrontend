@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import ExplorePage from "@/pages/explore";
@@ -65,6 +66,7 @@ function App() {
                 <div className="min-h-screen bg-background">
                   <Navbar />
                   <Router />
+                  <Footer />
                 </div>
                 <Toaster />
               </TooltipProvider>
