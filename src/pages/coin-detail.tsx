@@ -4,6 +4,7 @@ import { PriceChart } from "@/components/PriceChart";
 import { TradingPanel } from "@/components/TradingPanel";
 import { TransactionTable } from "@/components/TransactionTable";
 import { CommentsSection } from "@/components/CommentsSection";
+import CoinChat from "@/components/CoinChat";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -220,6 +221,8 @@ export default function CoinDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <PriceChart />
+
+            <CoinChat coinAddress={coinAddress} />
 
             <Card>
               <CardHeader>

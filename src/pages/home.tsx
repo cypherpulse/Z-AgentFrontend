@@ -1,74 +1,21 @@
 import { Hero } from "@/components/Hero";
 import { CoinCard } from "@/components/CoinCard";
-import { StatCard } from "@/components/StatCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Users, Coins, Activity } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useTopGainers, useTopVolume } from "@/lib/queries";
+import { useTopGainers, useMostValuableCreators } from "@/lib/queries";
 import { safeParseNumber, formatTokenPrice } from "@/lib/format";
 
 export default function HomePage() {
   const { data: topGainersData, isLoading: loadingGainers } = useTopGainers({ count: 6 });
-  const { data: topVolumeData, isLoading: loadingVolume } = useTopVolume({ count: 3 });
+  const { data: mostValuableCreatorsData, isLoading: loadingCreators } = useMostValuableCreators({ count: 3 });
 
   const trendingCoins = topGainersData?.pages[0]?.coins.slice(0, 3) || [];
-  const allCoins = topVolumeData?.pages[0]?.coins || [];
-
-  // Calculate stats from real data (backend returns values already formatted)
-  const totalMarketCap = allCoins.reduce(
-    (sum: number, coin: { marketCap: string }) => sum + safeParseNumber(coin.marketCap),
-    0
-  );
-  const totalHolders = allCoins.reduce((sum: number, coin: { uniqueHolders?: number; holders?: number }) => sum + (coin.uniqueHolders || coin.holders || 0), 0);
-  const totalVolume = allCoins.reduce(
-    (sum: number, coin: { volume24h: string }) => sum + safeParseNumber(coin.volume24h),
-    0
-  );
+  const creatorCoins = mostValuableCreatorsData?.pages[0]?.coins || [];
 
   return (
     <div className="min-h-screen">
       <Hero />
-
-      {/* Stats Section */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {loadingVolume ? (
-            <>
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-lg" />
-              ))}
-            </>
-          ) : (
-            <>
-              <StatCard
-                title="Total Market Cap"
-                value={`$${(totalMarketCap / 1000000).toFixed(1)}M`}
-                change={12.5}
-                icon={TrendingUp}
-              />
-              <StatCard
-                title="Active Traders"
-                value={`${(totalHolders / 1000).toFixed(1)}K`}
-                change={8.3}
-                icon={Users}
-              />
-              <StatCard
-                title="Total Coins"
-                value={allCoins.length.toString()}
-                change={15.7}
-                icon={Coins}
-              />
-              <StatCard
-                title="24h Volume"
-                value={`$${(totalVolume / 1000000).toFixed(1)}M`}
-                change={-3.2}
-                icon={Activity}
-              />
-            </>
-          )}
-        </div>
-      </section>
 
       {/* Trending Coins */}
       <section className="container mx-auto px-4 py-12">
@@ -91,6 +38,63 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {trendingCoins.map((coin: any) => {
+              const priceInUsdc = coin.tokenPrice?.priceInUsdc || '0';
+              const formattedPrice = formatTokenPrice(priceInUsdc, '$');
+              
+              const marketCapValue = safeParseNumber(coin.marketCap);
+              const marketCapFormatted = marketCapValue > 0 
+                ? `$${(marketCapValue / 1000000).toFixed(2)}M`
+                : '$0';
+              
+              const priceChange = coin.marketCapDelta24h 
+                ? parseFloat(coin.marketCapDelta24h) 
+                : undefined;
+              
+              // Get coin image from mediaContent
+              const coinImage = coin.mediaContent?.previewImage?.small || 
+                               coin.mediaContent?.previewImage?.medium || 
+                               coin.image;
+              
+              return (
+                <CoinCard
+                  key={coin.address}
+                  address={coin.address}
+                  name={coin.name}
+                  symbol={coin.symbol}
+                  image={coinImage}
+                  price={formattedPrice}
+                  priceChange24h={priceChange}
+                  marketCap={marketCapFormatted}
+                  holders={coin.uniqueHolders || coin.holders || 0}
+                  volume24h={coin.volume24h} // Added missing prop
+                />
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Most Valuable Creator Coins */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-bold font-serif">Most Valuable Creator Coins</h2>
+            <p className="text-muted-foreground mt-1">Top creator coins by market capitalization</p>
+          </div>
+          <Link href="/creator-coins">
+            <Button variant="outline" data-testid="button-view-all-creators">View All</Button>
+          </Link>
+        </div>
+        
+        {loadingCreators ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-56 w-full rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {creatorCoins.map((coin: any) => {
               const priceInUsdc = coin.tokenPrice?.priceInUsdc || '0';
               const formattedPrice = formatTokenPrice(priceInUsdc, '$');
               

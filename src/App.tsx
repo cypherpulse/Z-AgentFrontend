@@ -20,6 +20,7 @@ import CreatePage from "@/pages/create";
 import SchedulePage from "@/pages/schedule";
 import ProfilePage from "@/pages/profile";
 import MyProfilePage from "@/pages/my-profile";
+import AIPage from "@/pages/ai";
 import { useTheme } from "next-themes";
 
 function Router() {
@@ -32,6 +33,7 @@ function Router() {
       {/* <Route path="/trade" component={TradePage} /> */}
       <Route path="/create" component={CreatePage} />
       <Route path="/schedule" component={SchedulePage} />
+      <Route path="/ai" component={AIPage} />
       <Route path="/my-profile" component={MyProfilePage} />
       <Route path="/profile/:identifier" component={ProfilePage} />
       <Route component={NotFound} />

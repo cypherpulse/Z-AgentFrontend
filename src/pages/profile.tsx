@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CoinCard } from "@/components/CoinCard";
+import { ProfileChat } from "@/components/ProfileChat";
 import { formatAddress, formatNumber, formatTokenPrice, formatHolderBalance, PROFILE_BANNER_URL } from "@/lib/format";
 import {
   ArrowLeft,
@@ -306,6 +307,9 @@ export default function ProfilePage() {
               </div>
             </CardHeader>
           </Card>
+
+          {/* Profile AI Chat Section */}
+          <ProfileChat profile={profile.handle || walletAddress} />
 
           {/* Tabs Section */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
