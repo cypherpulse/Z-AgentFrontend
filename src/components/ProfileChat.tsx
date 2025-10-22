@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp, MessageCircle, Loader2 } from "lucide-react";
 import { askProfileAi, formatAiResponse } from "@/lib/aiApi";
+import ReactMarkdown from "react-markdown";
 
 interface ProfileChatProps {
   profile: string;
@@ -51,7 +52,26 @@ export function ProfileChat({ profile }: ProfileChatProps) {
               {messages.length === 0 && <div className="text-muted-foreground text-sm">Ask questions about this profile's coins, holdings, or creator info.</div>}
               {messages.map((msg, i) => (
                 <div key={i} className={`mb-2 text-sm ${msg.role === "user" ? "text-primary" : "text-accent-foreground"}`}>
-                  {msg.role === "user" ? <strong>You:</strong> : <strong>AI:</strong>} {msg.role === "ai" ? <span dangerouslySetInnerHTML={{ __html: msg.content }} /> : msg.content}
+                  {msg.role === "user" ? <strong>You:</strong> : <strong>AI:</strong>} {msg.role === "ai" ? (
+                    <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:border inline">
+                      <ReactMarkdown
+                        components={{
+                          h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                          h2: ({ children }) => <h2 className="text-base font-semibold mb-2">{children}</h2>,
+                          h3: ({ children }) => <h3 className="text-sm font-medium mb-1">{children}</h3>,
+                          p: ({ children }) => <p className="mb-2 last:mb-0 inline">{children}</p>,
+                          ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                          ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                          li: ({ children }) => <li className="text-sm">{children}</li>,
+                          code: ({ children }) => <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                          pre: ({ children }) => <pre className="bg-muted p-2 rounded text-xs overflow-x-auto mb-2">{children}</pre>,
+                          blockquote: ({ children }) => <blockquote className="border-l-2 border-primary pl-3 italic text-muted-foreground mb-2">{children}</blockquote>,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : msg.content}
                 </div>
               ))}
               {loading && (
