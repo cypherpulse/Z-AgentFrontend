@@ -119,7 +119,7 @@ export default function CreatePage() {
 
     try {
       // Step 1: Upload metadata to IPFS (via backend) - NO AUTH REQUIRED
-      console.log("Uploading metadata to IPFS...");
+      // Uploading metadata to IPFS
       const metadataResponse = await fetch(`${API_BASE_URL}/api/write/upload-metadata`, {
         method: "POST",
         headers: {
@@ -141,10 +141,10 @@ export default function CreatePage() {
       }
 
       const metadataData = await metadataResponse.json();
-      console.log("✅ Metadata uploaded:", metadataData);
+      // Metadata uploaded successfully
 
       // Step 2: Prepare create coin transaction - NO AUTH REQUIRED
-      console.log("Preparing transaction...");
+      // Preparing transaction
       const prepareResponse = await fetch(`${API_BASE_URL}/api/write/create-coin/prepare`, {
         method: "POST",
         headers: {
@@ -169,7 +169,7 @@ export default function CreatePage() {
       }
 
       const txData = await prepareResponse.json();
-      console.log("✅ Transaction prepared:", txData);
+      // Transaction prepared successfully
 
       // Extract transaction data from response (backend returns { success, data: { transaction: {...} } })
       const transaction = txData.data?.transaction || txData.data || txData;

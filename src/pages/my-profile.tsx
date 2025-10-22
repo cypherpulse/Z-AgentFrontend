@@ -555,7 +555,7 @@ export default function MyProfilePage() {
                       balance.coin.media?.previewImage?.medium ||
                       balance.coin.media?.previewImage?.small;
                     
-                    console.log(`Coin ${balance.coin.symbol} image:`, coinImage);
+                    // Coin image loaded
                     
                     return (
                       <CoinCard
@@ -627,7 +627,7 @@ export default function MyProfilePage() {
                       coin.media?.previewImage?.medium ||
                       coin.media?.previewImage?.small;
                     
-                    console.log(`Created coin ${coin.symbol} image:`, coinImage);
+                    // Created coin image loaded
                     
                     return (
                       <CoinCard

@@ -63,25 +63,25 @@ export default function SchedulePage() {
         const contentType = response.headers.get("content-type");
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("API error response:", errorText); // Debugging log
+          console.error("API error response:", errorText);
           setError(`API error: ${response.status} ${errorText}`);
           setScheduledCoins([]);
           return;
         }
         if (!contentType || !contentType.includes("application/json")) {
           const rawText = await response.text();
-          console.error("Non-JSON response:", rawText); // Debugging log
+          console.error("Non-JSON response:", rawText);
           throw new Error("Invalid response format. Expected JSON.");
         }
         const result = await response.json();
         if (!result || typeof result !== "object" || !Array.isArray(result.data)) {
           throw new Error("Invalid response format. Expected JSON with a data array.");
         }
-        console.log("Fetched scheduled coins:", result.data); // Debugging log
+        // Scheduled coins fetched successfully
         setScheduledCoins(result.data || []);
         setError(""); // Clear any previous errors
       } catch (err) {
-        console.error("Network or parsing error:", err); // Debugging log
+        console.error("Network or parsing error:", err);
         setError(
           `Network error: ${err instanceof Error ? err.message : String(err)}`
         );
@@ -133,7 +133,7 @@ export default function SchedulePage() {
       }
       const metadataData = await metadataResponse.json();
       // Align metadataUri extraction with create.tsx
-      console.log("✅ Metadata uploaded:", metadataData);
+      // Metadata uploaded successfully
       const metadataUri = metadataData.data?.uri; // Correctly access the URI from the data field
       if (!metadataUri) {
         setError("No metadata URI returned from backend");
@@ -184,7 +184,7 @@ export default function SchedulePage() {
         metadataUri,
         transaction,
       };
-      console.log("Extracted payload for scheduling:", payload);
+      // Payload extracted for scheduling
       setSuccess("Payload extracted. See console log.");
       // Optionally, you can display the payload in the UI or use it for further scheduling logic
 
@@ -195,7 +195,7 @@ export default function SchedulePage() {
         coinParams: {
           name: formData.name,
           symbol: formData.symbol,
-          metadataUri: metadataUri || "https://default-metadata.com",
+          metadataUri: metadataUri || import.meta.env.VITE_DEFAULT_METADATA_URI,
           currency: formData.currency,
           chainId: 8453,
           startingMarketCap: formData.startingMarketCap,
@@ -209,9 +209,8 @@ export default function SchedulePage() {
         },
       };
 
-      console.log("Payload being sent to backend:", schedulePayload);
       const scheduleResponse = await scheduleCoin(schedulePayload);
-      console.log("✅ Coin scheduled successfully:", scheduleResponse);
+      // Coin scheduled successfully
       setSuccess("Coin scheduled successfully!");
       setShowForm(false); // Hide the form
       setFormData({
@@ -235,7 +234,7 @@ export default function SchedulePage() {
   };
 
   const walletAddress = address || ""; // Use the address from auth context
-  const jwtToken = ""; // Replace with actual JWT token if available
+  const jwtToken =""; // Retrieve JWT token from localStorage
 
   return (
     <div className="container mx-auto px-4 py-8">
