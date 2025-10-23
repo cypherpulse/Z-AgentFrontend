@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 export default function CoinDetailPage() {
   const [, params] = useRoute("/coin/:address");
-  const coinAddress = params?.address || "";
+  const coinAddress = (params as any)?.address || "";
   const [showAllHolders, setShowAllHolders] = useState(false);
 
   const { data: coin, isLoading: loadingCoin } = useCoin(coinAddress, !!coinAddress);

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Send, Bot, User, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
-import { askCoinAi, formatAiResponse } from "@/lib/aiApi.ts";
+import { askCoinAi, formatAiResponse } from "../lib/aiApi";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
