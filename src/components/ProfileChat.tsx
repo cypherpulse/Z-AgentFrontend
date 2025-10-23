@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp, MessageCircle, Loader2 } from "lucide-react";
-import { askProfileAi, formatAiResponse } from "@/lib/aiApi";
+import { askProfileAi, formatAiResponse } from "@/lib/aiApi.ts";
 import ReactMarkdown from "react-markdown";
 
 interface ProfileChatProps {

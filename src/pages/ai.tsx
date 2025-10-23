@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Bot, User } from "lucide-react";
-import { askGeneralAi, formatAiResponse } from "@/lib/aiApi";
+import { askGeneralAi, formatAiResponse } from "@/lib/aiApi.ts";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
