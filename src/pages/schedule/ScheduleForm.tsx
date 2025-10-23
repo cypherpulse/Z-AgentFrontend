@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Upload, X, Image as ImageIcon, Video } from "lucide-react";
-import { getFilePreview, uploadToCloudinary } from "@/lib/cloudinary";
+import { getFilePreview, uploadToCloudinary, UploadProgress } from "@/lib/cloudinary";
 
 interface ScheduleFormProps {
   formData: {
@@ -67,7 +67,7 @@ export default function ScheduleForm({
       const preview = await getFilePreview(file);
       setPreviewUrl(preview);
       setPreviewType(file.type.startsWith("video/") ? "video" : "image");
-      const response = await uploadToCloudinary(file, (progress) => {
+      const response = await uploadToCloudinary(file, (progress: UploadProgress) => {
         setUploadProgress(progress.percentage);
       });
       setFormData({ ...formData, imageUri: response.secure_url });

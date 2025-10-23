@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, Upload, X, Loader2, Image as ImageIcon, Video } from "lucide-react";
 import { useState, useRef } from "react";
-import { uploadToCloudinary, getFilePreview } from "@/lib/cloudinary";
+import { uploadToCloudinary, getFilePreview, UploadProgress } from "@/lib/cloudinary";
 import { API_BASE_URL } from "@/lib/api";
 import { useLocation } from "wouter";
 import { useSendTransaction, useWaitForTransactionReceipt, useAccount } from "wagmi";
@@ -71,7 +71,7 @@ export default function CreatePage() {
       setPreviewType(file.type.startsWith("video/") ? "video" : "image");
 
       // Upload to Cloudinary
-      const response = await uploadToCloudinary(file, (progress) => {
+      const response = await uploadToCloudinary(file, (progress: UploadProgress) => {
         setUploadProgress(progress.percentage);
       });
 
