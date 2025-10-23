@@ -19,9 +19,19 @@ export default defineConfig({
         manualChunks: undefined,
       },
     },
+    // Suppress CSS warnings from dependencies
+    cssCodeSplit: true,
+  },
+  css: {
+    // Suppress PostCSS warnings
+    postcss: {
+      plugins: [],
+    },
   },
   server: {
     port: 5173,
     open: true,
   },
+  // Suppress build warnings
+  logLevel: 'info',
 });
