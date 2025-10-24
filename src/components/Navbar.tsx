@@ -23,8 +23,8 @@ export function Navbar() {
   }, [location]);
 
   const navLinks = [
-    { href: "/ai", label: "AI" },
     { href: "/", label: "Home" },
+    { href: "/ai", label: "AI" },
     { href: "/explore", label: "Explore" },
     { href: "/creator-coins", label: "Creator Coins" },
     { href: "/watchlist", label: "Watchlist" },
