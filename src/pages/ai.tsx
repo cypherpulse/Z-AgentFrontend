@@ -48,7 +48,7 @@ export default function AIPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bot className="h-6 w-6" />
-              AI Assistant
+              Z-Agent
             </CardTitle>
           </CardHeader>
           <CardContent>

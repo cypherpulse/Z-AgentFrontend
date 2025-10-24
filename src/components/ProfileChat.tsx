@@ -52,7 +52,7 @@ export function ProfileChat({ profile }: ProfileChatProps) {
               {messages.length === 0 && <div className="text-muted-foreground text-sm">Ask questions about this profile's coins, holdings, or creator info.</div>}
               {messages.map((msg, i) => (
                 <div key={i} className={`mb-2 text-sm ${msg.role === "user" ? "text-primary" : "text-accent-foreground"}`}>
-                  {msg.role === "user" ? <strong>You:</strong> : <strong>AI:</strong>} {msg.role === "ai" ? (
+                  {msg.role === "user" ? <strong>You:</strong> : <strong>Z-Agent:</strong>} {msg.role === "ai" ? (
                     <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:border inline">
                       <ReactMarkdown
                         components={{
