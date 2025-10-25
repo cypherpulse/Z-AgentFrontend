@@ -1,6 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 
-// Create a query client with default options
+// Create a query client with secure error handling
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -8,20 +8,22 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       retry: (failureCount, error: any) => {
-        // Don't retry on 401 (unauthorized) or 404 (not found)
-        if (error?.response?.status === 401 || error?.response?.status === 404) {
+        // Don't retry on client errors (4xx)
+        if (error?.cause?.status >= 400 && error?.cause?.status < 500) {
           return false;
         }
-        // Retry up to 2 times for other errors
+        // Retry network errors up to 3 times
+        if (error?.cause?.code === 'ERR_NETWORK' ||
+            error?.cause?.code === 'ERR_CONNECTION_TIMED_OUT' ||
+            error?.cause?.code === 'ERR_NETWORK_CHANGED') {
+          return failureCount < 3;
+        }
+        // Retry server errors up to 2 times
         return failureCount < 2;
       },
     },
     mutations: {
       retry: false,
-      onError: (error: any) => {
-        // Log error for mutations
-        console.error('Mutation error:', error?.response?.data?.message || error?.message);
-      },
     },
   },
 });

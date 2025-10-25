@@ -158,7 +158,7 @@ export default function CoinDetailPage() {
           </div>
           
           {/* Price Section - Always visible */}
-          <div className="flex flex-col items-start sm:items-end gap-1 sm:gap-2 p-3 sm:p-0 bg-card sm:bg-transparent rounded-lg sm:rounded-none border sm:border-0 w-full sm:w-auto">
+          <div className="flex flex-col items-start sm:items-end gap-1 sm:gap-2 p-3 sm:p-0 bg-card sm:bg-transparent rounded-lg sm:rounded-none border sm:border-0 w-full sm:w-auto sm:ml-auto">
             <p className="text-2xl sm:text-3xl font-bold font-mono break-all">
               {formatTokenPrice(coin.tokenPrice?.priceInUsdc || '0', '$')}
             </p>

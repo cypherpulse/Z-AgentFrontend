@@ -1,12 +1,20 @@
+// Custom error interface to extend Error with cause property
+interface ApiError extends Error {
+  cause?: {
+    status?: number;
+    code?: string;
+  };
+}
+
 import axios, { AxiosError, AxiosInstance } from 'axios';
+import { secureConfig } from './secureConfig';
+import { secureLogger } from './secureLogger';
+export const API_BASE_URL = secureConfig.api.baseUrl;
+export const CHAIN_ID = secureConfig.blockchain.chainId;
+const API_TIMEOUT = secureConfig.blockchain.timeout;
+const AUTH_TOKEN_KEY = secureConfig.security.authTokenKey;
 
-// API Configuration from environment variables
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const CHAIN_ID = parseInt(import.meta.env.VITE_CHAIN_ID || '8453', 10); // Base chain
-const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '30000', 10);
-const AUTH_TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || 'auth_token';
-
-// Create axios instance
+// Create axios instance with minimal headers to avoid CORS issues
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
@@ -31,14 +39,78 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      window.location.href = '/';
+    // Secure error handling - never log sensitive data to console in production
+    const isDevelopment = import.meta.env.DEV;
+
+    // Extract safe error information only
+    const safeError = {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      code: error.code,
+      message: error.message,
+      url: error.config?.url?.replace(/[?&].*/, ''), // Remove query params for security
+    };
+
+    // Only log in development and for non-sensitive errors
+    if (isDevelopment) {
+      // Don't log auth-related errors or sensitive API responses
+      if (safeError.status !== 401 && safeError.status !== 403) {
+        secureLogger.apiError('request', safeError);
+      }
     }
-    return Promise.reject(error);
+
+    // Handle authentication errors
+    if (error.response?.status === 401) {
+      // Clear sensitive data
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      // Don't redirect automatically to avoid exposing auth flow
+    }
+
+    // Return sanitized error
+    const sanitizedError: ApiError = new Error(
+      getUserFriendlyErrorMessage(safeError.status, safeError.code)
+    ) as ApiError;
+
+    // Preserve original error properties but remove sensitive data
+    sanitizedError.cause = {
+      status: safeError.status,
+      code: safeError.code,
+    };
+
+    return Promise.reject(sanitizedError);
   }
 );
+
+// Helper function for user-friendly error messages
+function getUserFriendlyErrorMessage(status?: number, code?: string): string {
+  switch (status) {
+    case 400:
+      return 'Invalid request. Please check your input.';
+    case 401:
+      return 'Authentication required.';
+    case 403:
+      return 'Access denied.';
+    case 404:
+      return 'Resource not found.';
+    case 429:
+      return 'Too many requests. Please try again later.';
+    case 500:
+      return 'Server error. Please try again.';
+    default:
+      break;
+  }
+
+  switch (code) {
+    case 'ERR_NETWORK':
+    case 'ERR_CONNECTION_TIMED_OUT':
+    case 'ERR_NETWORK_CHANGED':
+      return 'Connection issue. Please check your internet.';
+    case 'ERR_BAD_REQUEST':
+      return 'Invalid request.';
+    default:
+      return 'Something went wrong. Please try again.';
+  }
+}
 
 // ============================================
 // TYPE DEFINITIONS

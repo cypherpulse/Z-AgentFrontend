@@ -12,6 +12,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { PriceMonitor } from "@/components/PriceMonitor";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import ExplorePage from "@/pages/explore";
@@ -60,25 +61,27 @@ function RainbowKitWrapper({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <WagmiProvider config={config}>
-        <ThemeProvider>
-          <RainbowKitWrapper>
-            <AuthProvider>
-              <TooltipProvider>
-                                <div className="min-h-screen bg-background">
-                  <Navbar />
-                  <PriceMonitor />
-                  <Router />
-                  <Footer />
-                </div>
-                <Toaster />
-              </TooltipProvider>
-            </AuthProvider>
-          </RainbowKitWrapper>
-        </ThemeProvider>
-      </WagmiProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <WagmiProvider config={config}>
+          <ThemeProvider>
+            <RainbowKitWrapper>
+              <AuthProvider>
+                <TooltipProvider>
+                  <div className="min-h-screen bg-background">
+                    <Navbar />
+                    <PriceMonitor />
+                    <Router />
+                    <Footer />
+                  </div>
+                  <Toaster />
+                </TooltipProvider>
+              </AuthProvider>
+            </RainbowKitWrapper>
+          </ThemeProvider>
+        </WagmiProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

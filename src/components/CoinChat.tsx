@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Send, Bot, User, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { askCoinAi, formatAiResponse } from "../lib/aiApi";
+import { AddressLink } from "./AddressLink";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -105,6 +106,23 @@ const CoinChat: React.FC<CoinChatProps> = ({ coinAddress }) => {
                               code: ({ children }) => <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
                               pre: ({ children }) => <pre className="bg-muted p-2 rounded text-xs overflow-x-auto mb-2">{children}</pre>,
                               blockquote: ({ children }) => <blockquote className="border-l-2 border-primary pl-3 italic text-muted-foreground mb-2">{children}</blockquote>,
+                              a: ({ href, children }) => {
+                                // Check if href is an Ethereum address (starts with 0x and is 42 chars)
+                                if (href && /^0x[a-fA-F0-9]{40}$/.test(href)) {
+                                  return <AddressLink address={href}>{children}</AddressLink>;
+                                }
+                                // Regular link
+                                return (
+                                  <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:underline"
+                                  >
+                                    {children}
+                                  </a>
+                                );
+                              },
                             }}
                           >
                             {message.content}
