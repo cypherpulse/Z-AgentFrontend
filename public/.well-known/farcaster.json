@@ -9,13 +9,13 @@
   },
   "miniapp": {
     "version": "1",
-    "name": "Zora Agent - AI-Powered Coins Explorer",
-    "homeUrl": "https://www.zedagent.xyz/",
+    "name": "Zora Agent",
+    "homeUrl": "https://www.zedagent.xyz",
     "iconUrl": "https://www.zedagent.xyz/icon.png",
     "splashImageUrl": "https://www.zedagent.xyz/splash.png",
     "splashBackgroundColor": "#FFFFFF",
     "webhookUrl": "https://www.zedagent.xyz/api/webhook",
-    "subtitle": "AI-Powered Zora Coin Explorer",
+    "subtitle": "AI-Powered Zora Coins Explorer",
     "description": "Full-featured Web3 dashboard for discovering, creating, trading, and scheduling Zora Coins.",
     "screenshotUrls": [
       "https://www.zedagent.xyz/screenshot1.png",
@@ -32,7 +32,7 @@
     ],
     "heroImageUrl": "https://www.zedagent.xyz/hero.png",
     "tagline": "Explore Zora Coins with AI",
-    "ogTitle": "Zora Agent - AI-Powered Coins Explorer",
+    "ogTitle": "AI-Powered Zora Coins Explorer",
     "ogDescription": "Discover and trade Zora coins with AI insights on Base.",
     "ogImageUrl": "https://www.zedagent.xyz/og.png",
     "noindex": false

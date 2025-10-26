@@ -17,21 +17,21 @@ const manifest = {
   miniapp: {
     version: "1",
     name: process.env.VITE_MINIAPP_NAME || "Zora Agent - AI-Powered Coins Explorer",
-    homeUrl: process.env.VITE_MINIAPP_HOME_URL || "https://your-domain.com",
-    iconUrl: process.env.VITE_MINIAPP_ICON_URL || "https://your-domain.com/icon.png",
-    splashImageUrl: process.env.VITE_MINIAPP_SPLASH_IMAGE_URL || "https://your-domain.com/splash.png",
+    homeUrl: "https://www.zedagent.xyz",
+    iconUrl: "https://www.zedagent.xyz/icon.png",
+    splashImageUrl: "https://www.zedagent.xyz/splash.png",
     splashBackgroundColor: '#FFFFFF',
-    webhookUrl: process.env.VITE_MINIAPP_WEBHOOK_URL || "https://your-domain.com/api/webhook",
+    webhookUrl: "https://www.zedagent.xyz/api/webhook",
     subtitle: process.env.VITE_MINIAPP_SUBTITLE || "AI-Powered Zora Coin Explorer",
     description: process.env.VITE_MINIAPP_DESCRIPTION || "Full-featured Web3 dashboard for discovering, creating, trading, and scheduling Zora Coins on Base blockchain. Connect your wallet and explore the future of creator coins.",
-    screenshotUrls: (process.env.VITE_MINIAPP_SCREENSHOT_URLS || "https://your-domain.com/screenshot1.png,https://your-domain.com/screenshot2.png,https://your-domain.com/screenshot3.png").split(','),
+    screenshotUrls: ["https://www.zedagent.xyz/screenshot1.png", "https://www.zedagent.xyz/screenshot2.png", "https://www.zedagent.xyz/screenshot3.png"],
     primaryCategory: process.env.VITE_MINIAPP_PRIMARY_CATEGORY || "finance",
     tags: (process.env.VITE_MINIAPP_TAGS || "zora,coins,ai,web3,base").split(','),
-    heroImageUrl: process.env.VITE_MINIAPP_HERO_IMAGE_URL || "https://your-domain.com/hero.png",
+    heroImageUrl: "https://www.zedagent.xyz/hero.png",
     tagline: process.env.VITE_MINIAPP_TAGLINE || "Explore Zora Coins with AI",
     ogTitle: process.env.VITE_MINIAPP_OG_TITLE || "Zora Agent - AI-Powered Coins Explorer",
     ogDescription: process.env.VITE_MINIAPP_OG_DESCRIPTION || "Discover and trade Zora coins with AI insights on Base.",
-    ogImageUrl: process.env.VITE_MINIAPP_OG_IMAGE_URL || "https://your-domain.com/og.png",
+    ogImageUrl: "https://www.zedagent.xyz/og.png",
     noindex: process.env.VITE_MINIAPP_NOINDEX === "true"
   }
 };
