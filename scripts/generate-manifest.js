@@ -7,9 +7,9 @@ config({ path: path.join(process.cwd(), '.env') });
 
 const manifest = {
   accountAssociation: {
-    header: process.env.VITE_ACCOUNT_ASSOCIATION_HEADER || "",
-    payload: process.env.VITE_ACCOUNT_ASSOCIATION_PAYLOAD || "",
-    signature: process.env.VITE_ACCOUNT_ASSOCIATION_SIGNATURE || ""
+    header: process.env.VITE_ACCOUNT_ASSOCIATION_HEADER || "eyJmaWQiOjExNDY1MDMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhkRWRENTlDRTViQkFjNDc2MTk5RkExNmRENjI1MjA2NTlmOTUwNjc4In0",
+    payload: process.env.VITE_ACCOUNT_ASSOCIATION_PAYLOAD || "eyJkb21haW4iOiJ6ZWRhZ2VudC54eXoifQ",
+    signature: process.env.VITE_ACCOUNT_ASSOCIATION_SIGNATURE || "+ZVG360PtHfsEid1sCAxpY7rrcdc1ajd1+1/w8e2pNsmPhRzLfwGpyhOQP1CkgtKQcqdnARSE8zhI+wRHQQx/hs="
   },
   baseBuilder: {
     ownerAddress: process.env.VITE_BASE_BUILDER_OWNER_ADDRESS || "0x5f32eEfD9d8cb924e865706CA221af0B6fEeeADB"
