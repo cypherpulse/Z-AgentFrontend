@@ -12,7 +12,7 @@ const manifest = {
     signature: process.env.VITE_ACCOUNT_ASSOCIATION_SIGNATURE || ""
   },
   baseBuilder: {
-    ownerAddress: process.env.VITE_BASE_BUILDER_OWNER_ADDRESS || "0x"
+    ownerAddress: process.env.VITE_BASE_BUILDER_OWNER_ADDRESS
   },
   miniapp: {
     version: "1",
