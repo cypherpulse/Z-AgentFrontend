@@ -15,10 +15,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export function WalletButton() {
-  const { address, isConnected } = useAuth();
+  const { address, isConnected, isMiniApp } = useAuth();
   const [copied, setCopied] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
+
+  if (isMiniApp) {
+    // In mini app, auto-connected, show wallet info if connected
+    if (!isConnected) return null; // Wait for connection
+    // Proceed to show wallet dropdown
+  }
 
   const handleCopyAddress = (addr: string) => {
     navigator.clipboard.writeText(addr);
@@ -68,7 +74,7 @@ export function WalletButton() {
             })}
           >
             {(() => {
-              if (!connected) {
+              if (!isMiniApp && !connected) {
                 return (
                   <Button
                     onClick={openConnectModal}
@@ -79,6 +85,10 @@ export function WalletButton() {
                     Connect Wallet
                   </Button>
                 );
+              }
+
+              if (!connected) {
+                return null; // For mini app, wait
               }
 
               if (chain.unsupported) {

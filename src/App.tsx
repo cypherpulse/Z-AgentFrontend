@@ -26,6 +26,8 @@ import ProfilePage from "@/pages/profile";
 import MyProfilePage from "@/pages/my-profile";
 import AIPage from "@/pages/ai";
 import { useTheme } from "next-themes";
+import { sdk } from '@farcaster/miniapp-sdk';
+import { useEffect } from 'react';
 
 function Router() {
   return (
@@ -60,6 +62,17 @@ function RainbowKitWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  useEffect(() => {
+    const initMiniApp = async () => {
+      try {
+        await sdk.actions.ready();
+      } catch (error) {
+        console.error('Failed to initialize mini app:', error);
+      }
+    };
+    initMiniApp();
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
