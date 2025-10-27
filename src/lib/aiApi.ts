@@ -173,18 +173,10 @@ export const askCoinAi = async (params: { question: string; address: string }) =
  * NOTE: Removed HTML conversion to allow ReactMarkdown to handle raw markdown
  */
 export const formatAiResponse = (text: string): string => {
-  // Trim prices to 4 decimal places for better readability
-  const priceRegex = /(\$?\d+\.?\d{0,4})\d+/g;
-  let formattedText = text.replace(priceRegex, '$1');
-
-  // Also handle prices that might be in scientific notation or very small decimals
-  const smallPriceRegex = /(\$?0\.0{1,10})(\d{1,4})/g;
-  formattedText = formattedText.replace(smallPriceRegex, '$1$2');
-
   // Format Ethereum addresses to be clickable and copyable
   // Match Ethereum addresses (0x followed by 40 hex characters)
   const addressRegex = /\b(0x[a-fA-F0-9]{40})\b/g;
-  formattedText = formattedText.replace(addressRegex, '[$1]($1)');
+  const formattedText = text.replace(addressRegex, '[$1]($1)');
 
   // Return formatted text - let ReactMarkdown handle markdown parsing
   return formattedText;
