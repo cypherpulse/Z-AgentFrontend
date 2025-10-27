@@ -218,7 +218,7 @@ export default function PrivacyPolicyPage() {
               If you have any questions about this privacy policy or our data practices, please contact us:
             </p>
             <div className="space-y-2 text-sm">
-              <p><strong>Email:</strong> privacy@z-agent.com</p>
+              {/* <p><strong>Email:</strong> privacy@z-agent.com</p> */}
               <p><strong>Developer:</strong> cypherpulse.base.eth</p>
               <p><strong>Platform:</strong> Built on Base Network</p>
             </div>
