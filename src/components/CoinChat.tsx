@@ -71,9 +71,9 @@ const CoinChat: React.FC<CoinChatProps> = ({ coinAddress }) => {
           <CardContent>
             <div className="space-y-4">
               {/* Chat Messages */}
-              <div className="h-64 overflow-y-auto border rounded-lg p-4 space-y-4 bg-muted/30">
+              <div className="h-64 sm:h-80 overflow-y-auto border rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4 bg-muted/30">
                 {messages.length === 0 && (
-                  <div className="text-center text-muted-foreground">
+                  <div className="text-center text-muted-foreground py-8">
                     Ask me anything about this coin!
                   </div>
                 )}
@@ -86,26 +86,26 @@ const CoinChat: React.FC<CoinChatProps> = ({ coinAddress }) => {
                       <Bot className="h-5 w-5 mt-1 text-primary flex-shrink-0" />
                     )}
                     <div
-                      className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                      className={`max-w-[85%] sm:max-w-[80%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${
                         message.role === 'user'
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-background border'
                       }`}
                     >
                       {message.role === 'assistant' ? (
-                        <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:border">
+                        <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:border word-break break-words">
                           <ReactMarkdown
                             components={{
-                              h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-base font-semibold mb-2">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-sm font-medium mb-1">{children}</h3>,
-                              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                              ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                              ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                              li: ({ children }) => <li className="text-sm">{children}</li>,
-                              code: ({ children }) => <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                              pre: ({ children }) => <pre className="bg-muted p-2 rounded text-xs overflow-x-auto mb-2">{children}</pre>,
-                              blockquote: ({ children }) => <blockquote className="border-l-2 border-primary pl-3 italic text-muted-foreground mb-2">{children}</blockquote>,
+                              h1: ({ children }) => <h1 className="text-lg font-bold mb-2 break-words">{children}</h1>,
+                              h2: ({ children }) => <h2 className="text-base font-semibold mb-2 break-words">{children}</h2>,
+                              h3: ({ children }) => <h3 className="text-sm font-medium mb-1 break-words">{children}</h3>,
+                              p: ({ children }) => <p className="mb-2 last:mb-0 break-words">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1 break-words">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1 break-words">{children}</ol>,
+                              li: ({ children }) => <li className="text-sm break-words">{children}</li>,
+                              code: ({ children }) => <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono break-all">{children}</code>,
+                              pre: ({ children }) => <pre className="bg-muted p-2 rounded text-xs overflow-x-auto mb-2 break-words whitespace-pre-wrap">{children}</pre>,
+                              blockquote: ({ children }) => <blockquote className="border-l-2 border-primary pl-3 italic text-muted-foreground mb-2 break-words">{children}</blockquote>,
                               a: ({ href, children }) => {
                                 // Check if href is an Ethereum address (starts with 0x and is 42 chars)
                                 if (href && /^0x[a-fA-F0-9]{40}$/.test(href)) {
@@ -117,7 +117,7 @@ const CoinChat: React.FC<CoinChatProps> = ({ coinAddress }) => {
                                     href={href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-primary hover:underline"
+                                    className="text-primary hover:underline break-all"
                                   >
                                     {children}
                                   </a>
@@ -129,7 +129,7 @@ const CoinChat: React.FC<CoinChatProps> = ({ coinAddress }) => {
                           </ReactMarkdown>
                         </div>
                       ) : (
-                        message.content
+                        <div className="break-words">{message.content}</div>
                       )}
                     </div>
                     {message.role === 'user' && (
@@ -156,7 +156,7 @@ const CoinChat: React.FC<CoinChatProps> = ({ coinAddress }) => {
                   disabled={loading}
                   className="flex-1 text-sm"
                 />
-                <Button type="submit" disabled={loading || !input.trim()} size="sm">
+                <Button type="submit" disabled={loading || !input.trim()} size="sm" className="flex-shrink-0">
                   <Send className="h-3 w-3" />
                 </Button>
               </form>

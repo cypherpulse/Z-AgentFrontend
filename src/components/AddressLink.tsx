@@ -39,17 +39,17 @@ export const AddressLink: React.FC<AddressLinkProps> = ({ address, children }) =
   };
 
   return (
-    <div className="inline-flex items-center gap-1 group">
+    <div className="inline-flex flex-wrap items-center gap-1 group max-w-full">
       <Badge
         variant="outline"
-        className="font-mono text-xs cursor-pointer hover:bg-accent transition-colors px-2 py-1"
+        className="font-mono text-xs cursor-pointer hover:bg-accent transition-colors px-2 py-1 break-all sm:break-normal"
         onClick={handleViewCoin}
         title="Click to view coin details"
       >
-        <Eye className="w-3 h-3 mr-1" />
-        {truncateAddress(address)}
+        <Eye className="w-3 h-3 mr-1 flex-shrink-0" />
+        <span className="truncate sm:text-clip">{truncateAddress(address)}</span>
       </Badge>
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
         <Button
           variant="ghost"
           size="sm"
