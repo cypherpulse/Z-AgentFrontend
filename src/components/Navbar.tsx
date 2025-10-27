@@ -31,6 +31,7 @@ export function Navbar() {
     // { href: "/trade", label: "Trade" },
     { href: "/create", label: "Create" },
     { href: "/schedule", label: "Schedule" },
+    { href: "/about", label: "About" },
   ];
 
   return (

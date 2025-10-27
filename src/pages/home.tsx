@@ -1,4 +1,5 @@
 import { Hero } from "@/components/Hero";
+import { PlatformShowcase } from "@/components/PlatformShowcase";
 import { CoinCard } from "@/components/CoinCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -16,6 +17,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <Hero />
+
+      {/* Platform Showcase
+      <PlatformShowcase /> */}
 
       {/* Trending Coins */}
       <section className="container mx-auto px-4 py-12">

@@ -15,6 +15,9 @@ import { Footer } from "@/components/Footer";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
+import AboutPage from "@/pages/about";
+import PrivacyPolicyPage from "@/pages/privacy-policy";
+import TermsOfServicePage from "@/pages/terms-of-service";
 import ExplorePage from "@/pages/explore";
 import CreatorCoinsPage from "@/pages/creator-coins";
 import WatchlistPage from "@/pages/watchlist";
@@ -33,6 +36,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
+      <Route path="/about" component={AboutPage} />
+      <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+      <Route path="/terms-of-service" component={TermsOfServicePage} />
       <Route path="/explore" component={ExplorePage} />
       <Route path="/creator-coins" component={CreatorCoinsPage} />
       <Route path="/watchlist" component={WatchlistPage} />

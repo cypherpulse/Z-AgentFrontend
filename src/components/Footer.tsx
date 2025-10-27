@@ -34,6 +34,14 @@ export function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <p>© 2025 Z-Agent. All rights reserved.</p>
             <div className="flex items-center gap-4">
+              <Link href="/privacy-policy" className="hover:text-foreground transition-colors">
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <Link href="/terms-of-service" className="hover:text-foreground transition-colors">
+                Terms of Service
+              </Link>
+              <span>•</span>
               <span>Powered by Base & Zora</span>
               <span>•</span>
               <span>Built for creators</span>

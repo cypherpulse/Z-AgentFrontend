@@ -16,12 +16,12 @@ import {
 import { formatTokenPrice } from "@/lib/format";
 
 const categories = [
-  { value: "top-gainers", label: "Top Gainers", hook: useTopGainers },
-  { value: "top-volume", label: "Top Volume", hook: useTopVolume },
-  { value: "most-valuable", label: "Most Valuable", hook: useMostValuable },
   { value: "new", label: "New", hook: useNewCoins },
+  { value: "top-gainers", label: "Top Gainers", hook: useTopGainers },
+  { value: "top-volume", label: "Trending", hook: useTopVolume },
+  { value: "most-valuable", label: "Most Valuable", hook: useMostValuable },
   { value: "last-traded", label: "Recently Traded", hook: useLastTraded },
-  { value: "unique-traders", label: "Most Traders", hook: useLastTradedUnique },
+  { value: "unique-traders", label: "Unique Traders", hook: useLastTradedUnique },
 ];
 
 export default function ExplorePage() {
