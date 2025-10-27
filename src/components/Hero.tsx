@@ -18,7 +18,7 @@ export function Hero() {
       <div className="relative z-10 container mx-auto px-4 text-center space-y-8">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-2 border-primary-300 dark:border-primary-700 shadow-lg shadow-primary-200/50 dark:shadow-primary-900/20">
           <Zap className="h-4 w-4" />
-          <span className="text-sm font-medium">Powered by Base Blockchain</span>
+          <span className="text-sm font-medium">Powered by Zora</span>
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold font-serif tracking-tight">
