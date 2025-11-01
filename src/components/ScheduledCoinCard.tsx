@@ -166,10 +166,11 @@ const ScheduledCoinCard: React.FC<ScheduledCoinCardProps> = ({
           </div>
           <Menu
             menuButton={
-              <MenuButton className="p-2 rounded-full hover:bg-muted">
+              <MenuButton className="p-2 rounded-full hover:bg-muted relative z-10">
                 <MoreVertical className="w-5 h-5" />
               </MenuButton>
             }
+            portal
           >
             <MenuItem onClick={handleEdit}>Edit Time</MenuItem>
             <MenuItem onClick={handleDelete}>Delete</MenuItem>

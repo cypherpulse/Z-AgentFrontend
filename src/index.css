@@ -355,3 +355,19 @@
     inset: -1px;
   }
 }
+
+/* Fix z-index issue for @szhsin/react-menu dropdowns */
+.sz-menu {
+  z-index: 9999 !important;
+  position: relative;
+}
+
+.sz-menu__item {
+  z-index: 9999 !important;
+}
+
+/* Ensure menu container has proper positioning context */
+.sz-menu-container {
+  position: relative;
+  z-index: 1;
+}
