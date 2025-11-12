@@ -128,6 +128,31 @@ export interface AiConversationResponse {
 }
 
 // ============================================
+// AGENT CONVERSATION ENDPOINTS
+// ============================================
+
+export interface AgentMessage {
+  message: string;
+  userId: string;
+  timestamp?: string;
+}
+
+export interface AgentResponse {
+  response: string;
+  agent: string;
+  timestamp: string;
+  conversationId?: string;
+}
+
+export const sendAgentMessage = async (params: AgentMessage) => {
+  const { data } = await aiApiClient.post<AiApiResponse<AgentResponse>>(
+    '/api/conversation/conversational/converse',
+    params
+  );
+  return data;
+};
+
+// ============================================
 // AI CONVERSATION ENDPOINTS
 // ============================================
 
