@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { WalletButton } from "./WalletButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { NotificationsPanel } from "./NotificationsPanel";
-import { Menu } from "lucide-react";
+import { Menu, ChevronDown, Bot, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
@@ -10,11 +10,18 @@ import { Badge } from "./ui/badge";
 import { Bell } from "lucide-react";
 import { useAlertMonitor } from "@/hooks/use-watchlist";
 import { LOGO_URL } from "@/lib/format";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function Navbar() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [aiMode, setAiMode] = useState<'ai' | 'agent'>('ai'); // Default to AI mode
   const { unreadCount } = useAlertMonitor();
 
   // Close mobile menu when route changes
@@ -22,9 +29,17 @@ export function Navbar() {
     setMobileMenuOpen(false);
   }, [location]);
 
+  // Update aiMode based on current route
+  useEffect(() => {
+    if (location === '/ai') {
+      setAiMode('ai');
+    } else if (location === '/agent-dashboard') {
+      setAiMode('agent');
+    }
+  }, [location]);
+
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/ai", label: "AI" },
     { href: "/explore", label: "Explore" },
     { href: "/creator-coins", label: "Creator Coins" },
     { href: "/watchlist", label: "Watchlist" },
@@ -32,6 +47,11 @@ export function Navbar() {
     { href: "/create", label: "Create" },
     { href: "/schedule", label: "Schedule" },
     { href: "/about", label: "About" },
+  ];
+
+  const aiModeOptions = [
+    { key: 'ai', label: 'AI', href: '/ai', icon: Bot },
+    { key: 'agent', label: 'Agent Mode', href: '/agent-dashboard', icon: Users },
   ];
 
   return (
@@ -54,6 +74,40 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
+            {/* AI Mode Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all hover-elevate active-elevate-2 cursor-pointer flex items-center gap-2 ${
+                    location === '/ai' || location === '/agent-dashboard'
+                      ? "bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 shadow-sm"
+                      : "text-foreground/80 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/20"
+                  }`}
+                >
+                  {aiMode === 'ai' ? <Bot className="w-4 h-4" /> : <Users className="w-4 h-4" />}
+                  {aiModeOptions.find(option => option.key === aiMode)?.label}
+                  <ChevronDown className="w-3 h-3" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {aiModeOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <DropdownMenuItem
+                      key={option.key}
+                      onClick={() => setAiMode(option.key as 'ai' | 'agent')}
+                      className="cursor-pointer"
+                    >
+                      <Link href={option.href} className="flex items-center gap-2 w-full">
+                        <Icon className="w-4 h-4" />
+                        {option.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} data-testid={`link-${link.label.toLowerCase()}`}>
                 <div
@@ -119,6 +173,31 @@ export function Navbar() {
                   </SheetHeader>
                   <div className="flex-1 overflow-y-auto min-h-0">
                     <div className="flex flex-col gap-2 p-6">
+                      {/* AI Mode Selection for Mobile */}
+                      <div className="border-2 border-primary-200 dark:border-primary-800 rounded-lg p-4">
+                        <div className="text-sm font-medium text-muted-foreground mb-3">AI Mode</div>
+                        <div className="flex flex-col gap-2">
+                          {aiModeOptions.map((option) => {
+                            const Icon = option.icon;
+                            return (
+                              <Link key={option.key} href={option.href}>
+                                <div
+                                  className={`px-4 py-3 rounded-lg text-base font-medium transition-all cursor-pointer border-2 min-h-[48px] flex items-center gap-3 ${
+                                    aiMode === option.key
+                                      ? "bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-primary-300 dark:border-primary-700 shadow-md"
+                                      : "text-foreground hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/20 border-transparent hover:border-primary-200 dark:hover:border-primary-800"
+                                  }`}
+                                  onClick={() => setAiMode(option.key as 'ai' | 'agent')}
+                                >
+                                  <Icon className="w-5 h-5" />
+                                  {option.label}
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+
                       {/* Mobile Navigation Links */}
                       {navLinks.map((link) => (
                         <Link key={link.href} href={link.href}>
