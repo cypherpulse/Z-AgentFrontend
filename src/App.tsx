@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
@@ -28,6 +28,7 @@ import SchedulePage from "@/pages/schedule";
 import ProfilePage from "@/pages/profile";
 import MyProfilePage from "@/pages/my-profile";
 import AIPage from "@/pages/ai";
+import AgentDashboardPage from "@/pages/agent-dashboard";
 import { useTheme } from "next-themes";
 import { sdk } from '@farcaster/miniapp-sdk';
 import { useEffect } from 'react';
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/create" component={CreatePage} />
       <Route path="/schedule" component={SchedulePage} />
       <Route path="/ai" component={AIPage} />
+      <Route path="/agent-dashboard" component={AgentDashboardPage} />
       <Route path="/my-profile" component={MyProfilePage} />
       <Route path="/profile/:identifier" component={ProfilePage} />
       <Route component={NotFound} />
@@ -68,6 +70,9 @@ function RainbowKitWrapper({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const [location] = useLocation();
+  const isAgentDashboard = location === '/agent-dashboard';
+
   useEffect(() => {
     const initMiniApp = async () => {
       try {
@@ -91,7 +96,7 @@ function App() {
                     <Navbar />
                     <PriceMonitor />
                     <Router />
-                    <Footer />
+                    {!isAgentDashboard && <Footer />}
                   </div>
                   <Toaster />
                 </TooltipProvider>
