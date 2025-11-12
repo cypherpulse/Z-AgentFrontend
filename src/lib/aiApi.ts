@@ -14,7 +14,7 @@ interface ApiError extends Error {
 export const AI_BASE_URL = secureConfig.api.aiBaseUrl;
 const AI_API_TIMEOUT = secureConfig.blockchain.timeout;
 
-// Create axios instance for AI API with minimal headers
+// Create axios instance for AI API with minimal header
 const aiApiClient: AxiosInstance = axios.create({
   baseURL: AI_BASE_URL,
   timeout: AI_API_TIMEOUT,
