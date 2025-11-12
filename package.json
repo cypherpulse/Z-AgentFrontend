@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-manifest.js && vite build",
+    "build": "vite build",
+    "manifest": "node scripts/generate-manifest.js",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "generate-manifest": "node scripts/generate-manifest.js"
@@ -61,6 +62,8 @@
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "^2.15.4",
+    "remark-gfm": "^4.0.1",
+    "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
