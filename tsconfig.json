@@ -1,6 +1,6 @@
 {
-  "include": ["src/**/*", "shared/**/*", "attached_assets/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "shared/**/*", "attached_assets/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts", "**/*.css"],
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
@@ -17,6 +17,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"],
