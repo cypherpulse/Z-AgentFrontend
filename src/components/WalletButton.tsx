@@ -15,16 +15,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export function WalletButton() {
-  const { address, isConnected, isMiniApp } = useAuth();
+  const { address, isConnected, isMiniApp, isBaseApp, miniAppConnected, tryInstantAuth } = useAuth();
   const [copied, setCopied] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
-
-  if (isMiniApp) {
-    // In mini app, auto-connected, show wallet info if connected
-    if (!isConnected) return null; // Wait for connection
-    // Proceed to show wallet dropdown
-  }
 
   const handleCopyAddress = (addr: string) => {
     navigator.clipboard.writeText(addr);
@@ -32,15 +26,19 @@ export function WalletButton() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleMyProfileClick = () => {
-    if (!address) {
+  const handleMiniAppConnect = async () => {
+    try {
+      await tryInstantAuth();
+    } catch (error) {
       toast({
-        title: 'Wallet not connected',
-        description: 'Please connect your wallet to view your profile.',
+        title: 'Connection failed',
+        description: 'Unable to connect via Farcaster. Please try again.',
         variant: 'destructive',
       });
-      return;
     }
+  };
+
+  const handleMyProfileClick = () => {
     navigate('/my-profile');
   };
 
@@ -62,6 +60,46 @@ export function WalletButton() {
           chain &&
           (!authenticationStatus || authenticationStatus === "authenticated");
 
+        const overallConnected = connected || miniAppConnected;
+
+        if (isMiniApp) {
+          if (!overallConnected) {
+            if (isBaseApp) {
+              return (
+                <Button
+                  onClick={openConnectModal}
+                  className="gap-2"
+                  data-testid="button-wallet-connect"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Connect Wallet
+                </Button>
+              );
+            } else {
+              return (
+                <Button
+                  onClick={handleMiniAppConnect}
+                  className="gap-2"
+                  data-testid="button-miniapp-connect"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Connect via Farcaster
+                </Button>
+              );
+            }
+          }
+
+          if (miniAppConnected && !isBaseApp) {
+            return (
+              <Button variant="secondary" className="gap-2">
+                <Wallet className="h-4 w-4" />
+                Connected via Farcaster
+              </Button>
+            );
+          }
+          // For Base App connected via wallet, fall through to normal UI
+        }
+
         return (
           <div
             {...(!ready && {
@@ -74,7 +112,7 @@ export function WalletButton() {
             })}
           >
             {(() => {
-              if (!isMiniApp && !connected) {
+              if (!connected) {
                 return (
                   <Button
                     onClick={openConnectModal}
@@ -85,10 +123,6 @@ export function WalletButton() {
                     Connect Wallet
                   </Button>
                 );
-              }
-
-              if (!connected) {
-                return null; // For mini app, wait
               }
 
               if (chain.unsupported) {
